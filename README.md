@@ -6,6 +6,6 @@ The Database, API and Web App are all currently under early stages of developmen
 
 API is Rest with ExpressJS.\
 DB is Non-SQL.\
-WebApp is Angular.\
+WebApp is Angular.
 
 Contributions Welcome.
