@@ -1,8 +1,11 @@
 # Yomi 📚
 Self-Hosted Manga Server and Accompanying Web App.
 
-## Development
-The API is currently being developed.
-Development and creation of the Web App will start once the API is somewhat usable.
+## Development Status
+The Database, API and Web App are all currently under early stages of development.
 
-The Web App and Server will be run as seperate independent Docker containers.
+API is Rest with ExpressJS.\
+DB is Non-SQL.\
+WebApp is Angular.
+
+Contributions Welcome.
