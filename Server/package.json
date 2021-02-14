@@ -1,0 +1,17 @@
+{
+  "name": "yomi-server",
+  "version": "1.0.0",
+  "description": "Backend for Yomi.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "NozzaVevo",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.11"
+  }
+}
