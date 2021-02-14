@@ -1,10 +1,29 @@
-<h1> Yomi WebApp </h1>
-<h2> Not yet developed. </h2>
-<p> The app will have cool features to interact with the backend database. </p>
-<p>
-  The app will be able to: <br>
-   - Read manga from the database<br>
-   - Upload manga to the database<br>
-   - Create collections of selected manga<br>
-   - Browse through your collections and all books<br>
-</p>
+<mat-toolbar color='primary' class='toolBar'>
+  <button mat-icon-button (click)="snav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  Yomi
+</mat-toolbar>
+
+<mat-sidenav-container hasBackdrop="true">
+  <mat-sidenav #snav mode="'over'" [fixedInViewport]="true">
+    <mat-nav-list>
+      <mat-list-item routerLink="/library" (click)="snav.close()">
+        <mat-icon matListIcon>book</mat-icon>
+        Library
+      </mat-list-item>
+      <mat-list-item (click)="snav.close()">
+        <mat-icon matListIcon>settings</mat-icon>
+        Settings
+      </mat-list-item>
+      <mat-list-item (click)="snav.close()">
+        <mat-icon matListIcon>cancel</mat-icon>
+        Close
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

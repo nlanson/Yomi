@@ -1,0 +1,43 @@
+//Toolbar
+.toolBar {
+  z-index: 2;
+  position: fixed;
+}
+
+//Side Nav
+mat-sidenav-container {
+  padding:0px;
+}
+
+.mat-sidenav-content {
+  padding-top: 100px;
+  padding-left: 20px;
+  height:100vh;
+}
+
+.mat-sidenav {
+  position: fixed;
+  padding-top: 75px;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+}
+
+.mat-list
+.mat-list-item
+.mat-nav-list
+.mat-list-item
+.mat-selection-list
+.mat-list-item {
+  color:#FFF;
+  width: 200px;
+}
+.mat-list-item:hover {
+  background-color: darkgray ;
+  color: black;
+}
+
+.mat-list-icon {
+  color:  beige;
+  padding:4px;
+}
