@@ -1,5 +1,7 @@
 FROM node:12 AS compile-image
 
+VOLUME [ "/data" ]
+
 WORKDIR /opt/ng
 
 COPY package.json ./
