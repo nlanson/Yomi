@@ -35,13 +35,13 @@ class Database {
     setup() {
         return __awaiter(this, void 0, void 0, function* () {
             this.mangadb = yield this.scan_dir();
-            this.init_db();
+            yield this.init_db();
         });
     }
     refresh() {
         return __awaiter(this, void 0, void 0, function* () {
             this.mangadb = yield this.scan_dir();
-            this.init_db();
+            yield this.init_db();
         });
     }
     //Scans for any directories that could contain manga in the Database Path.
@@ -55,7 +55,7 @@ class Database {
                     if (fs_1.default.statSync(fileDir).isDirectory()) { //If the file in this.dbpath is a directory, add to the mangas list.
                         mangasList.push({
                             title: file,
-                            path: path_1.default.relative(this.dbpath, fileDir)
+                            path: fileDir
                         });
                     }
                 });
@@ -66,31 +66,37 @@ class Database {
     }
     //Initiales the DB from scanned dirs.
     init_db() {
-        console.log('Creating DB');
-        for (let i = 0; i < this.mangadb.length; i++) {
-            this.mangadb[i].pageCount = this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
-            if (this.mangadb[i].pageCount == 0) {
-                this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
-                continue;
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('Creating DB');
+            for (let i = 0; i < this.mangadb.length; i++) {
+                this.mangadb[i].pageCount = this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
+                if (this.mangadb[i].pageCount == 0) {
+                    this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
+                    continue;
+                }
+                this.mangadb[i].pages = yield this.makePagesArray(this.mangadb[i].path); //Create an array of pages and their directories.
+                this.mangadb[i].cover = this.addPreview(this.mangadb[i].pages); //Creates a cover property with the first page of the manga as the value.
             }
-            this.mangadb[i].pages = this.makePagesArray(this.mangadb[i].path); //Create an array of pages and their directories.
-        }
-        console.log('DONE');
+            console.log('DONE');
+        });
     }
-    getPageCount(rel_path) {
-        let abs_path = path_1.default.join(this.dbpath, rel_path);
+    addPreview(pages) {
+        return pages[0];
+    }
+    getPageCount(abs_path) {
         return fs_1.default.readdirSync(abs_path).length;
     }
-    makePagesArray(rel_path) {
-        let abs_path = path_1.default.join(this.dbpath, rel_path);
-        var pages = [];
-        fs_1.default.readdir(abs_path, (err, files) => {
-            files.forEach((file) => {
-                //TODO: Only push jpg, png or jpeg file types as often manga downloaded contains ads in pdf or html format.
-                pages.push(rel_path + '/' + file);
+    makePagesArray(abs_path) {
+        return new Promise((resolve) => {
+            var pages = [];
+            fs_1.default.readdir(abs_path, (err, files) => {
+                files.forEach((file) => {
+                    //TODO: Only push jpg, png or jpeg file types as often manga downloaded contains ads in pdf or html format.
+                    pages.push(abs_path + '/' + file);
+                });
+                resolve(pages);
             });
         });
-        return pages;
     }
 } //END DB Class
 class Server {

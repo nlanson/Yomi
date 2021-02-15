@@ -6,7 +6,7 @@ services:
     environment:
       TZ: Australia/Sydney
     volumes:
-      - "./data:/data"
+      - "./data:/usr/share/nginx/html/data" #Data is mounted to the directory where the Angular App is running.
     ports:
       - "8080:80"
     container_name: webapp

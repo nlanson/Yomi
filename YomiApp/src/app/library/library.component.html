@@ -1,4 +1,23 @@
 <h1> Library Works! </h1>
 <p> This component will list every manga/book in the database.</p>
 
-<!--Make API Request from database service and display results here with ngFor loop.-->
+
+<mat-card class="mangaCard" *ngFor='let manga of list'>
+  <mat-card-header>
+    <mat-card-title>{{manga.title}}</mat-card-title>
+    <mat-card-subtitle>@{{manga.path}}</mat-card-subtitle>
+  </mat-card-header>
+  <img mat-card-image src="{{manga.cover}}" alt="Manga Cover Image">
+  <mat-card-actions>
+    <button mat-raised-button color='secondary'>Edit</button> <!--Will open pop over to edit manga details eg title-->
+    <button mat-raised-button color='primary'>Read</button> <!--Will open component to read the manga-->
+  </mat-card-actions>
+</mat-card>
+
+<!--
+  TODO:
+    - Limit manga cover image size.
+    - Make manga cards line up properly grid style.
+
+
+-->
