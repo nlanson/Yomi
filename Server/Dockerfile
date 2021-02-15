@@ -2,6 +2,8 @@ FROM node:12
 
 VOLUME [ "/data" ]
 
+RUN ls
+
 WORKDIR /app
 
 COPY package.json ./
