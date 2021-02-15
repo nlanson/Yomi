@@ -151,7 +151,7 @@ class Server {
 } //END Server Class
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        var dbpath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/manga'; //Will be docker manga volume.
+        var dbpath = '/data/manga'; //Will be docker manga volume.
         var db = new Database(dbpath);
         yield db.setup();
         let server = new Server(app, db);

@@ -151,7 +151,7 @@ class Server {
 
 
 async function main() {
-    var dbpath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/manga' //Will be docker manga volume.
+    var dbpath = '/data/manga' //Will be docker manga volume.
     var db = new Database(dbpath);
     await db.setup();
     
