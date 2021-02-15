@@ -3,19 +3,20 @@ version: "3"
 services:
   webapp:
     image: nlanson/yomiapp:test
+    environment:
+      TZ: Australia/Sydney
+    volumes:
+      - "./data:/data"
     ports:
       - "8080:80"
-    environment:
-      TZ: Australia/Sydney
-    volumes:
-      - "./data:/data"
-    container_name: yomiapp
+    container_name: webapp
   server:
     image: nlanson/yomiserver:test
-    ports:
-      - "6969:6969"
     environment:
       TZ: Australia/Sydney
     volumes:
       - "./data:/data"
-    container_name: yomiserver
+    ports:
+      - "6969:6969"
+    container_name: server
+    

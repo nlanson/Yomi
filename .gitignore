@@ -1,2 +1,3 @@
 server/node_modules
-test/data/manga/*
+
+test/data/manga
