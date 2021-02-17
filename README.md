@@ -5,7 +5,8 @@ Self-Hosted Manga Server and Accompanying Web App.
 The Database, API and Web App are all currently under early stages of development.
 
 API is Rest with ExpressJS.\
-DB is Non-SQL.\
+DB is Non-SQL JSON Based.\
 WebApp is Angular.
 
-Contributions Welcome.
+Contributions Welcome.\
+Please have a look at todo.md for development status
