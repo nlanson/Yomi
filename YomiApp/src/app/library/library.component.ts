@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { DatabaseService } from '../database/database.service';
+
+import {MatGridList} from '@angular/material/grid-list';
 
 @Component({
   selector: 'app-library',
@@ -7,6 +9,7 @@ import { DatabaseService } from '../database/database.service';
   styleUrls: ['./library.component.scss']
 })
 export class LibraryComponent implements OnInit {
+  @ViewChild('grid') grid: MatGridList;
 
   list: any;
 

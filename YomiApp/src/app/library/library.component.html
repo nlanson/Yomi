@@ -1,6 +1,6 @@
 <h1> Your Manga: </h1>
 
-<mat-grid-list cols='5' gutterSize="10">
+<!-- <mat-grid-list cols='5'>
   <mat-grid-tile *ngFor='let manga of list'>
     <div class='cardContainer'>
       <mat-card class='mangaCard'>
@@ -18,7 +18,28 @@
       </mat-card>
     </div>
   </mat-grid-tile>
-</mat-grid-list>
+</mat-grid-list> -->
+
+
+<div class="content">
+  <div fxLayout="row wrap" fxLayoutGap="16px grid">
+    <div fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' *ngFor="let manga of list">
+      <mat-card class="mat-elevation-z4">
+        <mat-card-header>
+          <mat-card-title>{{manga.title}}</mat-card-title>
+          <mat-card-subtitle>{{manga.pageCount}} Pages</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="{{manga.cover}}">
+        <mat-card-actions>
+          <button mat-raised-button>EDIT</button>
+          <button mat-raised-button color='primary'>READ</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+  </div>
+
+
 
 
 <!--
@@ -26,7 +47,6 @@
     - Limit manga cover image size and keep card size consistant
     - Make manga cards have consistant height and reponsive
     - Try - https://zoaibkhan.com/blog/create-a-responsive-card-grid-in-angular-using-flex-layout-part-1/
-    - https://stackoverflow.com/a/50616103/14035883 (Dynamically set col count of mat-grid-list with fxLayout)
 
 
 -->
