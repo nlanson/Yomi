@@ -130,6 +130,7 @@ class Server {
         this.refreshdb();
         this.searchByTitle();
         this.listdb();
+        this.editManga();
         this.listen();
     }
     listen() {
@@ -177,10 +178,55 @@ class Server {
             res.json({ status: 'Refreshed.' });
         });
     }
+    editManga() {
+        this.app.get('/editmanga/:edit', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            console.log('Edit Requested');
+            let edit = req.params.edit;
+            edit = JSON.parse(edit);
+            let ogName = edit.title;
+            let newName = edit.edit;
+            let i = 0;
+            let found = false;
+            let message;
+            while (i < this.db.mangadb.length && found == false) { //Loop through every manga
+                if (this.db.mangadb[i].title == ogName) { //If ogname equals any manga in the db then..,
+                    found = true;
+                    this.db.mangadb[i].title = newName; //Set manga title to the new name
+                    fs_1.default.rename(this.db.mangadb[i].path, this.db.dbpath + '/' + newName, (err) => {
+                        if (err)
+                            message = err && console.log(err);
+                        else
+                            console.log(`Successfully Edited ${ogName} -> ${newName}`);
+                        this.db.refresh(); //Refresh DB
+                        if (!message)
+                            message = 'Success';
+                        let response = {
+                            found: found,
+                            message: message
+                        };
+                        res.json(response); //Response with found = true and message being either success or rename err.
+                    });
+                }
+                i++;
+            }
+            //If no match was found, then response with 'manga not found'
+            if (found == false) {
+                console.log('Edit is Invalid');
+                message = 'Manga not found';
+                let response = {
+                    found: found,
+                    message: message
+                };
+                res.json(response); //Respond with found = false and manga not found.
+            }
+        }));
+    }
 } //END Server Class
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        var dbpath = '/data/manga'; //Will be docker manga volume.
+        let prodPath = '/data/manga';
+        let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
+        var dbpath = prodPath;
         var db = new Database(dbpath);
         yield db.setup();
         let server = new Server(app, db);

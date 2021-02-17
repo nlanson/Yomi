@@ -1,26 +1,5 @@
 <h1> Your Manga: </h1>
 
-<!-- <mat-grid-list cols='5'>
-  <mat-grid-tile *ngFor='let manga of list'>
-    <div class='cardContainer'>
-      <mat-card class='mangaCard'>
-        <mat-card-header>
-          <mat-card-title>{{manga.title}}</mat-card-title>
-          <mat-card-subtitle>@{{manga.path}}</mat-card-subtitle>
-        </mat-card-header>
-        <div class='coverImage'>
-          <img mat-card-image src="{{manga.cover}}" alt="Manga Cover Image" class='coverImage'>
-        </div>
-        <mat-card-actions class='actionsButtons txt-center'>
-          <button mat-raised-button color='secondary' slot='end'>Edit</button>
-          <button mat-raised-button color='primary'>Read</button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  </mat-grid-tile>
-</mat-grid-list> -->
-
-
 <div class="content">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
     <div fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' fxLayoutAlign=" stretch" *ngFor="let manga of list">
@@ -31,19 +10,21 @@
         </mat-card-header>
         <img mat-card-image src="{{manga.cover}}" class='coverImage'>
         <mat-card-footer>
-          <button mat-raised-button class='actionButtons'>EDIT</button>
+          <button mat-raised-button class='actionButtons'>EDIT</button> <!--See Notes Below-->
           <button mat-raised-button color='primary' class='actionButtons'>READ</button>
         </mat-card-footer>
       </mat-card>
     </div>
   </div>
-  </div>
-
-
-
+</div>
 
 <!--
-  TODO:
-    - Limit manga cover image size and keep card size consistant.
-    - Make manga cards have consistant height.
+  NOTES
+    For the edit page, the server side API request is made.
+    make the request to /editmanga/:edit
+    edit object will have two properties:
+      - title = the current title of the manga (edit target)
+      - edit = the new title of the manga (edit contents)
+
+    Maybe use a small popup form as the edit form is only going to be one field.
 -->
