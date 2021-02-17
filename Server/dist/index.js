@@ -28,6 +28,17 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const app = express_1.default();
 const port = 6969;
+/*
+DB Structure:
+[
+    {
+        title: string, //Title of manga (Taken from dir name)
+        path: string, //Path of manga (Path for manga dir)
+        pages: Array<string>, //List of pages for manga (Within the path dir)
+        cover: string //First page of the manga (From pages list)
+    }
+]
+*/
 class Database {
     constructor(dbpath) {
         this.dbpath = dbpath;
@@ -90,6 +101,18 @@ class Database {
         return new Promise((resolve) => {
             var pages = [];
             fs_1.default.readdir(abs_path, (err, files) => {
+                files = files.map(function (fileName) {
+                    return {
+                        name: fileName,
+                        time: fs_1.default.statSync(abs_path + '/' + fileName).mtime.getTime()
+                    };
+                })
+                    .sort(function (a, b) {
+                    return a.time - b.time;
+                })
+                    .map(function (v) {
+                    return v.name;
+                });
                 files.forEach((file) => {
                     //TODO: Only push jpg, png or jpeg file types as often manga downloaded contains ads in pdf or html format.
                     pages.push(abs_path + '/' + file);
