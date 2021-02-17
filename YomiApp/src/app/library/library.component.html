@@ -23,17 +23,17 @@
 
 <div class="content">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
-    <div fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' *ngFor="let manga of list">
+    <div fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' fxLayoutAlign=" stretch" *ngFor="let manga of list">
       <mat-card class="mat-elevation-z4">
         <mat-card-header>
           <mat-card-title>{{manga.title}}</mat-card-title>
           <mat-card-subtitle>{{manga.pageCount}} Pages</mat-card-subtitle>
         </mat-card-header>
-        <img mat-card-image src="{{manga.cover}}">
-        <mat-card-actions>
-          <button mat-raised-button>EDIT</button>
-          <button mat-raised-button color='primary'>READ</button>
-        </mat-card-actions>
+        <img mat-card-image src="{{manga.cover}}" class='coverImage'>
+        <mat-card-footer>
+          <button mat-raised-button class='actionButtons'>EDIT</button>
+          <button mat-raised-button color='primary' class='actionButtons'>READ</button>
+        </mat-card-footer>
       </mat-card>
     </div>
   </div>
@@ -44,9 +44,6 @@
 
 <!--
   TODO:
-    - Limit manga cover image size and keep card size consistant
-    - Make manga cards have consistant height and reponsive
-    - Try - https://zoaibkhan.com/blog/create-a-responsive-card-grid-in-angular-using-flex-layout-part-1/
-
-
+    - Limit manga cover image size and keep card size consistant.
+    - Make manga cards have consistant height.
 -->

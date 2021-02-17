@@ -1,18 +1,16 @@
-.mangaCard {
-  width: 50%;
-}
-
-.coverImage{
-  object-fit: cover; /*this makes the image in src fit to the size specified below*/
-  width: 100%; /* Here you can use wherever you want to specify the width and also the height of the <img>*/
-  height: 80%;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-
+mat-card-footer {
+  margin-bottom: 2px;
+  align-content: center;
+  text-align: center;
 }
 
 .actionButtons {
-  text-align: center;
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+
+.coverImage {
+  vertical-align: middle;
 }
 

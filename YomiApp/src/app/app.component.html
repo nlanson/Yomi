@@ -16,6 +16,10 @@
         <mat-icon matListIcon>settings</mat-icon>
         Settings
       </mat-list-item>
+      <mat-list-item (click)="snav.close()" (click)="refreshdb()">
+        <mat-icon matListIcon>refresh</mat-icon>
+        Refresh DB
+      </mat-list-item>
       <mat-list-item (click)="snav.close()">
         <mat-icon matListIcon>cancel</mat-icon>
         Close

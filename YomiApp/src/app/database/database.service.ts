@@ -27,4 +27,12 @@ export class DatabaseService {
 
     return manga.pages[0];
   }
+
+  async refreshdb() {
+    let url = this.baseurl + '/refresh'
+    let status:any = await this.http.get(url).toPromise();
+
+    if (status.status == 'Refreshed') return
+    else console.log('Refresh Failed');
+  }
 }
