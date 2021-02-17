@@ -16,12 +16,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatGridListModule} from '@angular/material/grid-list';
+import { CollectionsComponent } from './collections/collections.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    LibraryComponent
+    LibraryComponent,
+    CollectionsComponent
   ],
   imports: [
     BrowserModule,
