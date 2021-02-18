@@ -10,7 +10,7 @@ To do list. Each item on this todo list should have a corresponding issue.
  - [x] Library Page CSS
  - [] Collections and Server Side Collections Data Storage
  - [] Uploading Manga from Web App to Server.
- - [] Edit Manga details (Name, Delete)
+ - [x] Edit Manga details (Name, Delete)
 
 ## Low Priority
  - [] Web App Security (Password Protection from Docker Env)
