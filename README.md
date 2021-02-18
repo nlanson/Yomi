@@ -10,3 +10,8 @@ WebApp is Angular.
 
 Contributions Welcome.\
 Please have a look at todo.md for development status
+
+## Preview
+Main Page: 
+![Main Page](https://i.imgur.com/o331hRW.jpg)
+
