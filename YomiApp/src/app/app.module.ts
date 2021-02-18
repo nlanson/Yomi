@@ -6,29 +6,38 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { LibraryComponent } from './library/library.component';
+import { CollectionsComponent } from './collections/collections.component';
+import { EditMangaComponent } from './modals/edit-manga/edit-manga.component';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatGridListModule} from '@angular/material/grid-list';
-import { CollectionsComponent } from './collections/collections.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LibraryComponent,
-    CollectionsComponent
+    CollectionsComponent,
+    EditMangaComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     FlexLayoutModule,
     HttpClientModule,
     MatToolbarModule,
@@ -37,9 +46,13 @@ import { CollectionsComponent } from './collections/collections.component';
     MatListModule,
     MatButtonModule,
     MatCardModule,
-    MatGridListModule
+    MatGridListModule,
+    MatDialogModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSnackBarModule
   ],
-  providers: [],
+  providers: [LibraryComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

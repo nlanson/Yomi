@@ -10,21 +10,10 @@
         </mat-card-header>
         <img mat-card-image src="{{manga.cover}}" class='coverImage'>
         <mat-card-footer>
-          <button mat-raised-button class='actionButtons'>EDIT</button> <!--See Notes Below-->
+          <button mat-raised-button class='actionButtons' (click)="openEdit(manga.title)">EDIT</button> <!--See Notes Below-->
           <button mat-raised-button color='primary' class='actionButtons'>READ</button>
         </mat-card-footer>
       </mat-card>
     </div>
   </div>
 </div>
-
-<!--
-  NOTES
-    For the edit page, the server side API request is made.
-    make the request to /editmanga/:edit
-    edit object will have two properties:
-      - title = the current title of the manga (edit target)
-      - edit = the new title of the manga (edit contents)
-
-    Maybe use a small popup form as the edit form is only going to be one field.
--->
