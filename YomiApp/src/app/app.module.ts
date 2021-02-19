@@ -24,6 +24,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ReadComponent } from './read/read.component';
 
 
 
@@ -34,7 +35,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     LibraryComponent,
     CollectionsComponent,
     EditMangaComponent,
-    UploadMangaComponent
+    UploadMangaComponent,
+    ReadComponent
   ],
   imports: [
     BrowserModule,

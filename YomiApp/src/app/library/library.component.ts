@@ -35,6 +35,11 @@ export class LibraryComponent implements OnInit {
     console.log(this.list);
   }
 
+  read(title) {
+    console.log(`read ${title}`);
+    this.router.navigate(['read', title]);
+  }
+
   getMangaCover(title) {
     return new Promise(async (resolve) => {
       let cover = await this.db.getCoverImage(title);

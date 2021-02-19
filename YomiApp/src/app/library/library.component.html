@@ -13,11 +13,11 @@
         <img mat-card-image src="{{manga.cover}}" class='coverImage'>
         <mat-card-footer>
           <button mat-raised-button class='actionButtons' (click)="openEdit(manga.title)">EDIT</button> <!--See Notes Below-->
-          <button mat-raised-button color='primary' class='actionButtons'>READ</button>
+          <button mat-raised-button color='primary' class='actionButtons' (click)='read(manga.title)'>READ</button>
         </mat-card-footer>
       </mat-card>
     </div>
   </div>
 </div>
-
+<br>
 <button mat-raised-button (click)='openUpload()' color='primary'>Upload</button>

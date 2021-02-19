@@ -16,13 +16,20 @@ export class DatabaseService {
     private http: HttpClient
   ) { }
 
-  async getList() {
+  async getList(): Promise<any> {
     let url = this.baseurl + '/list';
     let list = await this.http.get(url).toPromise();
     return list;
   }
 
-  async getCoverImage(title) {
+  async getManga(title): Promise<any> {
+    let url = this.baseurl + `/manga/${title}`;
+    let manga = await this.http.get(url).toPromise();
+
+    return manga;
+  }
+
+  async getCoverImage(title): Promise<any> {
     let url = this.baseurl + `/manga/${title}`;
     let manga:any = await this.http.get(url).toPromise();
 
@@ -37,7 +44,7 @@ export class DatabaseService {
     else { console.log('Refresh Failed'); return false }
   }
 
-  async editManga(editObj) {
+  async editManga(editObj): Promise<any> {
     let editString = JSON.stringify(editObj);
     let url = this.baseurl + '/editManga/' + editString;
     let res: any = await this.http.get(url).toPromise();
