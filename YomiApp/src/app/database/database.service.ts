@@ -45,6 +45,7 @@ export class DatabaseService {
     return res;
   }
 
+  //Not finalised
   async uploadManga(formData) {
     let url = this.baseurl + '/upload';
     this.http.post(url, formData).subscribe(
