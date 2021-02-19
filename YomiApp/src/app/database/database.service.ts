@@ -45,5 +45,13 @@ export class DatabaseService {
     return res;
   }
 
+  async uploadManga(formData) {
+    let url = this.baseurl + '/upload';
+    this.http.post(url, formData).subscribe(
+      (res) => console.log(res),
+      (err) => console.log(err)
+    );
+  }
+
 
 }

@@ -6,6 +6,7 @@ import { EditMangaComponent } from '../modals/edit-manga/edit-manga.component';
 
 import {MatGridList} from '@angular/material/grid-list';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { UploadMangaComponent } from '../modals/upload-manga/upload-manga.component';
 
 
 @Component({
@@ -53,6 +54,17 @@ export class LibraryComponent implements OnInit {
       await this.getList();
     });
 
+  }
+
+  openUpload() {
+    const dialogRef = this.dialog.open(UploadMangaComponent, {
+      width: '500px',
+    });
+
+    dialogRef.afterClosed().subscribe( async () => {
+      console.log('The Upload dialog was closed');
+      await this.getList();
+    });
   }
 
 }

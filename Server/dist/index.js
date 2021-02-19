@@ -24,6 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const upload = require('express-fileupload');
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const app = express_1.default();
@@ -126,11 +127,15 @@ class Server {
     constructor(app, db) {
         this.app = app;
         this.db = db;
-        //List all the api requests here.
+        this.init_server();
+    }
+    init_server() {
+        this.app.use(upload());
         this.refreshdb();
         this.searchByTitle();
         this.listdb();
         this.editManga();
+        this.upload();
         this.listen();
     }
     listen() {
@@ -220,6 +225,31 @@ class Server {
                 res.json(response); //Respond with found = false and manga not found.
             }
         }));
+    }
+    upload() {
+        this.app.get('/upload', (req, res) => {
+            res.json({ status: 'failed', message: `You've requested this the wrong way.` });
+        });
+        this.app.post('/upload', (req, res) => {
+            if (req.files) {
+                console.log('Recieving Upload...');
+                let file = req.files.file;
+                let filename = file.name;
+                file.mv(this.db.dbpath + '/' + filename, (err) => {
+                    if (err) {
+                        res.json({ status: 'failed', message: 'Failed in file.mv()' });
+                        console.log('Upload Failed at mv().');
+                    }
+                    else {
+                        res.json({ status: 'Success', message: 'File uploaded' });
+                        console.log('Upload Success');
+                    }
+                });
+            }
+            else {
+                res.json({ status: 'failed', message: 'no file uploaded.' });
+            }
+        });
     }
 } //END Server Class
 function main() {

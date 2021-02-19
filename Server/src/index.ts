@@ -1,4 +1,5 @@
 import express from 'express';
+const upload = require('express-fileupload');
 import fs from 'fs';
 import path from 'path';
 
@@ -118,15 +119,22 @@ class Server {
         this.app = app;
         this.db = db;
 
-        //List all the api requests here.
+        this.init_server();
+        
+    }
+
+    init_server() {
+        this.app.use(upload());
+        
         this.refreshdb();
         this.searchByTitle();
         this.listdb();
         this.editManga();
+        this.upload();
 
         this.listen();
     }
-
+    
     listen() { //Starts API
         this.app.listen(port, () => {
             console.log(`Yomi Server listening at http://localhost:${port}`)
@@ -218,6 +226,36 @@ class Server {
                 res.json(response); //Respond with found = false and manga not found.
             }
         });
+    }
+
+    upload() {
+        this.app.get('/upload', (req: any, res: any) => {
+            res.json({status: 'failed', message: `You've requested this the wrong way.`})
+        })
+        
+        this.app.post('/upload', (req: any, res: any) => {
+            if ( req.files ) {
+                console.log('Recieving Upload...')
+                let file = req.files.file;
+                let filename = file.name;
+
+                file.mv(this.db.dbpath + '/' + filename, (err: any) => {
+                    if(err) { 
+                        res.json({status: 'failed', message: 'Failed in file.mv()'});
+                        console.log('Upload Failed at mv().');
+                    }
+                    else { 
+                        res.json({status: 'Success', message:'File uploaded'});
+                        console.log('Upload Success')
+
+                        // Handle uploaded file here.
+
+                    }
+                })
+            } else {
+                res.json({status: 'failed', message: 'no file uploaded.'})
+            }
+        })
     }
 
 }//END Server Class
