@@ -12,6 +12,7 @@ import { LibraryComponent } from './library/library.component';
 import { CollectionsComponent } from './collections/collections.component';
 import { EditMangaComponent } from './modals/edit-manga/edit-manga.component';
 import { UploadMangaComponent } from './modals/upload-manga/upload-manga.component';
+import { ReadComponent } from './read/read.component';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -24,8 +25,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { ReadComponent } from './read/read.component';
-
 
 
 
