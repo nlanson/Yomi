@@ -92,7 +92,9 @@ class Database {
     }
 
     getPageCount(abs_path: string): number { //Counts how many pages in a manga dir.
-        //Need to ONLY return the count of files not folders.
+        
+        //ONLY RETURN THE COUNT OF IMAGES IN A FOLDER. 
+        // DONT COUNT FOLDERS IN FOLDERS OR OTHER JUNK
         
         return fs.readdirSync(abs_path).length;
     }
@@ -380,6 +382,10 @@ export class UploadValidator {
     }
 
     getPageCount(abs_path: string): number { //Counts how many pages in a temp manga dir.
+        
+        //ONLY RETURN THE COUNT OF IMAGES IN A FOLDER. 
+        // DONT COUNT FOLDERS IN FOLDERS OR OTHER JUNK
+        
         return fs.readdirSync(abs_path).length;
     }
 
