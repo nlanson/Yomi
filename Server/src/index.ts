@@ -1,7 +1,9 @@
+import e from 'express';
 import express from 'express';
 const upload = require('express-fileupload');
 import fs from 'fs';
 import path from 'path';
+const unzipper = require('unzipper');
 
 const app = express();
 const port = 6969;
@@ -55,6 +57,10 @@ class Database {
                                 title: file,
                                 path: fileDir
                             });
+                        } else {
+                            fs.unlink(fileDir, (err) => {
+                                if (err) console.log(err)
+                            })
                         }
                     });
                     console.log('DONE');
@@ -71,6 +77,7 @@ class Database {
             this.mangadb[i].pageCount = this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
             if ( this.mangadb[i].pageCount == 0 ) {
                 this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
+                fs.rmdirSync(this.mangadb[i].path, { recursive: true });
                 continue
             }
 
@@ -85,6 +92,8 @@ class Database {
     }
 
     getPageCount(abs_path: string): number { //Counts how many pages in a manga dir.
+        //Need to ONLY return the count of files not folders.
+        
         return fs.readdirSync(abs_path).length;
     }
 
@@ -248,17 +257,31 @@ class Server {
                 let file = req.files.file;
                 let filename = file.name;
 
-                file.mv(this.db.dbpath + '/' + filename, (err: any) => {
-                    if(err) { 
+                file.mv(this.db.dbpath + '/' + filename, async (err: any) => { //Move received upload to dbpath/upload.zip
+                    if(err) { //If move fails return error
                         res.status(510).send({status: 'failed', message: 'Failed in file.mv()'});
                         console.log('Upload Failed at mv().');
                     }
                     else { 
-                        res.status(200).send({message:'File has been uploaded'});
                         console.log('Upload Success')
 
-                        // Handle uploaded file here.
+                        //IF move is successful:
+                        let filetype = path.extname(this.db.dbpath + '/' + filename); //Get file type
+                        let valid: Boolean = false;
+                        if(filetype == '.zip') { //If file type is ZIP, the run the validateZIP function.
+                            try {
+                                valid = await this.validateZip(filename)
+                            } catch(error) {
+                                console.log(error);
+                                valid = false;
+                            }
+                        } 
 
+                        if ( valid == true ) {
+                            res.status(200).send({message:'Uploaded and Unpacked'});
+                        } else {
+                            res.status(414).send({message:'Uploaded but Invalid'});
+                        }
                     }
                 })
             } else {
@@ -267,7 +290,128 @@ class Server {
         })
     }
 
+    async validateZip(zipFile: String): Promise<Boolean> { //Validates the uploaded zip file.
+        return new Promise(async (resolve, reject) => {
+            let temp = this.db.dbpath + '/temp/';
+            const zip = await fs.createReadStream(this.db.dbpath + '/' + zipFile) //Extract ZIP to /temp/ folder.
+                .pipe(unzipper.Extract({ path: temp }))
+                .on('close', async () => {
+                    //When unzipping finishes, run the validator code on the temp direcetory.
+                    let validator = new UploadValidator(temp, this.db, this.db.dbpath + '/' + zipFile);
+                    let valid = await validator.validate();
+                    
+                    if (valid) resolve(true);
+                    else  resolve(false);
+                });   
+        });
+    }
+
 }//END Server Class
+
+export class UploadValidator {
+
+    temp: string;
+    real: Database;
+    zip: string;
+    
+    constructor(
+        temp: string,
+        real: Database,
+        zip: string
+    ) {
+        this.temp = temp;
+        this.real = real;
+        this.zip = zip;
+    }
+
+    async validate() { //Validator Code.
+        let tempdb: any = await this.scan_temp();  //Creates a temporary db to track files/dirs in the temp folder.
+        for ( let i=0; i < tempdb.length; i++ ) {
+            tempdb.pageCount = this.getPageCount(tempdb[i].path); 
+            if ( tempdb.pageCount == 0 ) { //IF a directory in temp folder has no content, then remove it and delete it from the temp folder.
+                tempdb.splice(i, 1); 
+                if ( fs.statSync(tempdb[i].path).isDirectory() ) {
+                    fs.rmdirSync(tempdb[i].path, { recursive: true });
+                }
+                continue
+            }
+        }
+        
+        let mvError = await this.mv(tempdb); //move contents of temp directory into the live database.
+        if ( mvError ) {
+            //If the moves fails
+            console.log('Failed at mv()');
+            this.deleteZip();
+            return false
+        } else {
+            //If the move succeeds, delete the temp folder and zip.
+            this.delelteTemp();
+            this.deleteZip();
+            return true;
+        }
+    }
+
+    async scan_temp() { //scans the temp directory for any directories and adds them into tempdb. (Code reused from Database Class)
+        return new Promise((resolve) => {
+            var mangasList: any[] = [];
+            fs.readdir(this.temp, (err, files) => {
+                if ( files == undefined  ) {
+                    console.log('files undefined in temp (340)')
+                    resolve(mangasList);
+                } else {
+                    files.forEach((file) => {
+                        let fileDir = path.join(this.temp, file);
+                        if ( fs.statSync(fileDir).isDirectory() ) { //If the file in this.dbpath is a directory, add to the mangas list.
+                            mangasList.push({
+                                title: file,
+                                path: fileDir
+                            });
+                        } else {
+                            fs.unlink(fileDir, (err) => {
+                                if (err) console.log(err)
+                            })
+                        }
+                    });
+                    resolve(mangasList);
+                }
+            }); 
+        });
+    }
+
+    getPageCount(abs_path: string): number { //Counts how many pages in a temp manga dir.
+        return fs.readdirSync(abs_path).length;
+    }
+
+    async mv(tempdb: any) { //Moves valid manga in the tempdb to the live database.
+        let error: boolean = false;
+
+        if ( tempdb.length == 0 ) return true;
+        
+        for ( let i=0; i < tempdb.length; i++ ) {
+            fs.rename(tempdb[i].path, this.real.dbpath + '/' + tempdb[i].title, (err) => {
+                if (err) console.log(err)
+                error = true;
+            });
+        }
+
+        return error;
+    }
+
+    async delelteTemp() { //Deletes the temp directory and uploaded zip.
+        console.log('Deleting temp...');
+        fs.rmdir(this.temp, (err) => {
+            if (err) console.log(err)
+        });
+    }
+
+    async deleteZip() {
+        console.log('Deleting ZIP');
+        fs.unlink(this.zip, (err) => {
+            if (err) console.log(err)
+        })
+    }
+
+}
 
 
 

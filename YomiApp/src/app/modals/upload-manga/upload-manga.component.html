@@ -2,7 +2,7 @@
 <br>
 
 <form [formGroup]='uploadForm' (ngSubmit)='submit()'>
-  <input type='file' formControlName='file' (change)="fileChange($event)" />
+  <input type='file' formControlName='file' (change)="fileChange($event)" accept='.zip'/> <!--Will add RAR Support-->
   <br>
   <button mat-raised-button type='submit' color='primary' *ngIf='file != null'>Upload ({{Math.floor(file.size/1000/1000)}}MB)</button>
 </form>
