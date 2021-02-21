@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 
@@ -10,7 +10,7 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class DatabaseService {
 
-  baseurl:string = 'http://localhost:6969'
+  baseurl:string = 'https://mdb.nlanson.ga'
 
   constructor(
     private http: HttpClient
@@ -54,12 +54,15 @@ export class DatabaseService {
   }
 
   //Not finalised
-  async uploadManga(formData) {
+  uploadManga(file: File) {
     let url = this.baseurl + '/upload';
-    this.http.post(url, formData).subscribe(
-      (res) => console.log(res),
-      (err) => console.log(err)
-    );
+    let fd = new FormData();
+    fd.append('file', file, file.name);
+
+    return this.http.post(url, fd, {
+      reportProgress: true,
+      observe: 'events'
+    });
   }
 
 

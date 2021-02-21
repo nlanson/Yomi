@@ -9,8 +9,10 @@
   "author": "NozzaVevo",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "express-fileupload": "^1.2.1"
+    "express-fileupload": "^1.2.1",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
