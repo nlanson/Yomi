@@ -251,7 +251,7 @@ class Server {
                         console.log('Upload Failed at mv().');
                     }
                     else {
-                        res.status(200).send({ message: 'File uploaded' });
+                        res.status(200).send({ message: 'File has been uploaded' });
                         console.log('Upload Success');
                         // Handle uploaded file here.
                     }

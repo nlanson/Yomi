@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import {  FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { DatabaseService } from '../../database/database.service';
 

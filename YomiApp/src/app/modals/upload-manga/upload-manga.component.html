@@ -1,3 +1,14 @@
 <h1>Upload</h1>
 <br>
-Need uploading component.
+
+<form [formGroup]='uploadForm' (ngSubmit)='submit()'>
+  <input type='file' formControlName='file' (change)="fileChange($event)" />
+  <br>
+  <button mat-raised-button type='submit' color='primary' *ngIf='file != null'>Upload ({{Math.floor(file.size/1000/1000)}}MB)</button>
+</form>
+<br>
+<div *ngIf='progress != 0'>
+  <h3> Progress: {{progress}}%</h3>
+  <mat-progress-bar mode="determinate" value="{{this.progress}}" color='warn'></mat-progress-bar>
+  <h4 *ngIf='progress == 100'> Upload Complete </h4>
+</div>
