@@ -31,8 +31,13 @@ export class LibraryComponent implements OnInit {
   }
 
   async getList() {
-    this.list = await this.db.getList();
-    console.log(this.list);
+    var res = await this.db.getList();
+    if (res.status == 200) {
+      this.list = res.body;
+    } else {
+      console.log(`List Status Code ${res.status}.`);
+      this.list = [];
+    }
   }
 
   read(title) {
@@ -42,7 +47,15 @@ export class LibraryComponent implements OnInit {
 
   getMangaCover(title) {
     return new Promise(async (resolve) => {
-      let cover = await this.db.getCoverImage(title);
+      let res = await this.db.getCoverImage(title);
+      let cover: string;
+      if ( res.status == 200 ) { //Need prod test
+        cover = res.body.pages[0];
+      } else if ( res.status == 411 ) {
+        console.log('Manga was not found... (Cover)');
+        cover = 'https://store.charteredaccountantsanz.com/sca-dev-kilimanjaro/img/no_image_available.jpeg' //Not avail jpg
+      }
+
       console.log(`Cover for ${title} is at ${cover}`);
       resolve(cover);
     });

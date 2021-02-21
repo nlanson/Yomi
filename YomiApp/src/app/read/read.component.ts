@@ -25,7 +25,17 @@ export class ReadComponent implements OnInit {
     });
 
     console.log(this.title);
-    this.manga = await this.db.getManga(this.title);
+    let res = await this.db.getManga(this.title);
+
+    if ( res.status == 200 ) {
+      console.log(res.body);
+      this.manga = res.body;
+    } else if ( res.status == 411 ) {
+      console.log(`${this.title} was not found in the database.`);
+      this.manga = undefined;
+    } else {
+      console.log(`Error (Unknown)`)
+    }
   }
 
 }

@@ -40,15 +40,15 @@ export class EditMangaComponent implements OnInit {
 
     let res = await this.db.editManga(editObj);
 
-    if ( res.found == true && res.message == 'Success' ) {
+    if ( res.status == 200 ) {
       console.log('edit successful');
       this.openSnackBar('Edit Successful', 'Great!');
-    } else if ( res.found == true && res.message != 'Success' ) {
+    } else if ( res.status > 400 && res.status < 500 ) {
+      console.log(`edit was invalid`);
+      this.openSnackBar('Edit Failed Miserably (Invalid)', 'RIP');
+    } else if ( res.staus > 500 ) {
       console.log('edit request was valid but rename failed.');
       this.openSnackBar('Edit Failed. Have another shot at it.', 'Ok!');
-    } else {
-      console.log('edit was invalid');
-      this.openSnackBar('Edit Failed Miserably', 'RIP');
     }
 
     this.dialogRef.close();
@@ -56,7 +56,7 @@ export class EditMangaComponent implements OnInit {
 
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
-      duration: 2000,
+      duration: 4000,
     });
   }
 

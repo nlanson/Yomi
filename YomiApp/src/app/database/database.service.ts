@@ -18,36 +18,37 @@ export class DatabaseService {
 
   async getList(): Promise<any> {
     let url = this.baseurl + '/list';
-    let list = await this.http.get(url).toPromise();
+    let list = await this.http.get(url, {observe: 'response'}).toPromise();
+
     return list;
   }
 
   async getManga(title): Promise<any> {
     let url = this.baseurl + `/manga/${title}`;
-    let manga = await this.http.get(url).toPromise();
+    let manga = await this.http.get(url, {observe: 'response'}).toPromise();
 
     return manga;
   }
 
   async getCoverImage(title): Promise<any> {
     let url = this.baseurl + `/manga/${title}`;
-    let manga:any = await this.http.get(url).toPromise();
+    let res:any = await this.http.get(url, {observe: 'response'}).toPromise();
 
-    return manga.pages[0];
+    return res;
   }
 
   async refreshdb(): Promise<Boolean> {
     let url = this.baseurl + '/refresh'
-    let status:any = await this.http.get(url).toPromise();
+    let status:any = await this.http.get(url, {observe: 'response'}).toPromise();
 
-    if (status.status == 'Refreshed.')  { return true }
+    if (status.status == 200)  { return true }
     else { console.log('Refresh Failed'); return false }
   }
 
   async editManga(editObj): Promise<any> {
     let editString = JSON.stringify(editObj);
     let url = this.baseurl + '/editManga/' + editString;
-    let res: any = await this.http.get(url).toPromise();
+    let res: any = await this.http.get(url, {observe: 'response'}).toPromise();
 
     return res;
   }

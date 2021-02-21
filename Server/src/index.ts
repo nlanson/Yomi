@@ -35,6 +35,7 @@ class Database {
     async refresh() { //For refreshing the DB from API
         this.mangadb = await this.scan_dir();
         await this.init_db();
+        return true;
     }
     
     //Scans for any directories that could contain manga in the Database Path.
@@ -44,17 +45,21 @@ class Database {
         return new Promise((resolve) => {
             var mangasList: any[] = [];
             fs.readdir(this.dbpath, (err, files) => {
-                files.forEach((file) => {
-                    let fileDir = path.join(this.dbpath, file);
-                    if ( fs.statSync(fileDir).isDirectory() ) { //If the file in this.dbpath is a directory, add to the mangas list.
-                        mangasList.push({
-                            title: file,
-                            path: fileDir
-                        });
-                    }
-                });
-                console.log('DONE');
-                resolve(mangasList);
+                if ( files == undefined  ) {
+                    resolve(mangasList);
+                } else {
+                    files.forEach((file) => {
+                        let fileDir = path.join(this.dbpath, file);
+                        if ( fs.statSync(fileDir).isDirectory() ) { //If the file in this.dbpath is a directory, add to the mangas list.
+                            mangasList.push({
+                                title: file,
+                                path: fileDir
+                            });
+                        }
+                    });
+                    console.log('DONE');
+                    resolve(mangasList);
+                }
             }); 
         });
     }
@@ -152,12 +157,12 @@ class Server {
             while ( i < this.db.mangadb.length && found == false ) {
                 if ( this.db.mangadb[i].title == req.params.title ) {
                     found = true;
-                    res.json(this.db.mangadb[i]);
+                    res.status(200).send(this.db.mangadb[i]);
                 }
                 i++
             }
 
-            if ( found == false ) res.json({status: 'Not Found'});
+            if ( found == false ) res.status(411).send({message: 'Manga not found'});
         });
     }
 
@@ -171,15 +176,18 @@ class Server {
                 list.push(listEntry);
             }
             
-            res.json(list);
+            res.status(200).send(list);
         });
     }
 
     refreshdb() { //Refreshes the DB
-        this.app.get('/refresh', (req: any, res: any) => {
+        this.app.get('/refresh', async (req: any, res: any) => {
             console.log('Refresh requested.')
-            this.db.refresh();
-            res.json({status: 'Refreshed.'})
+            let status = await this.db.refresh();
+
+            if ( status == true ) {
+                res.status(200).send({message: 'Refresed.'});
+            }
         })
     }
 
@@ -200,16 +208,17 @@ class Server {
 
                     this.db.mangadb[i].title = newName; //Set manga title to the new name
                     fs.rename(this.db.mangadb[i].path, this.db.dbpath + '/' +newName, (err) => { //Rename old manga path to new manga path.
-                        if (err) message = err &&  console.log(err);
+                        if (err) { message = err;  console.log(err); }
                         else console.log(`Successfully Edited ${ogName} -> ${newName}`);
                         this.db.refresh(); //Refresh DB
                         
-                        if (!message) message = 'Success';
-                        let response = {
-                            found: found,
-                            message: message
+                        if (!message) { 
+                            message = 'Success';
+                            res.status(200).send({message: message}); // Full success
+                        } else{
+                            res.status(510).send({message: message}); //Partial success. Manga was valid but rename failed.
                         }
-                        res.json(response); //Response with found = true and message being either success or rename err.
+                        
                     });
                 }
                 i++;
@@ -223,14 +232,14 @@ class Server {
                     found: found,
                     message: message
                 }
-                res.json(response); //Respond with found = false and manga not found.
+                res.status(411).send(response); //Respond with found = false and manga not found.
             }
         });
     }
 
     upload() {
         this.app.get('/upload', (req: any, res: any) => {
-            res.json({status: 'failed', message: `You've requested this the wrong way.`})
+            res.status(412)({status: 'failed', message: `You've requested this the wrong way.`})
         })
         
         this.app.post('/upload', (req: any, res: any) => {
@@ -241,11 +250,11 @@ class Server {
 
                 file.mv(this.db.dbpath + '/' + filename, (err: any) => {
                     if(err) { 
-                        res.json({status: 'failed', message: 'Failed in file.mv()'});
+                        res.status(510).send({status: 'failed', message: 'Failed in file.mv()'});
                         console.log('Upload Failed at mv().');
                     }
                     else { 
-                        res.json({status: 'Success', message:'File uploaded'});
+                        res.status(200).send({message:'File uploaded'});
                         console.log('Upload Success')
 
                         // Handle uploaded file here.
@@ -253,7 +262,7 @@ class Server {
                     }
                 })
             } else {
-                res.json({status: 'failed', message: 'no file uploaded.'})
+                res.status(413).send({message: 'Failed, no file uploaded.'})
             }
         })
     }

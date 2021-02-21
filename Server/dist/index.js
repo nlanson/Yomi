@@ -54,6 +54,7 @@ class Database {
         return __awaiter(this, void 0, void 0, function* () {
             this.mangadb = yield this.scan_dir();
             yield this.init_db();
+            return true;
         });
     }
     //Scans for any directories that could contain manga in the Database Path.
@@ -62,17 +63,22 @@ class Database {
         return new Promise((resolve) => {
             var mangasList = [];
             fs_1.default.readdir(this.dbpath, (err, files) => {
-                files.forEach((file) => {
-                    let fileDir = path_1.default.join(this.dbpath, file);
-                    if (fs_1.default.statSync(fileDir).isDirectory()) { //If the file in this.dbpath is a directory, add to the mangas list.
-                        mangasList.push({
-                            title: file,
-                            path: fileDir
-                        });
-                    }
-                });
-                console.log('DONE');
-                resolve(mangasList);
+                if (files == undefined) {
+                    resolve(mangasList);
+                }
+                else {
+                    files.forEach((file) => {
+                        let fileDir = path_1.default.join(this.dbpath, file);
+                        if (fs_1.default.statSync(fileDir).isDirectory()) { //If the file in this.dbpath is a directory, add to the mangas list.
+                            mangasList.push({
+                                title: file,
+                                path: fileDir
+                            });
+                        }
+                    });
+                    console.log('DONE');
+                    resolve(mangasList);
+                }
             });
         });
     }
@@ -153,12 +159,12 @@ class Server {
             while (i < this.db.mangadb.length && found == false) {
                 if (this.db.mangadb[i].title == req.params.title) {
                     found = true;
-                    res.json(this.db.mangadb[i]);
+                    res.status(200).send(this.db.mangadb[i]);
                 }
                 i++;
             }
             if (found == false)
-                res.json({ status: 'Not Found' });
+                res.status(411).send({ message: 'Manga not found' });
         });
     }
     listdb() {
@@ -173,15 +179,17 @@ class Server {
                 })(this.db.mangadb[manga]); // Remove pages property from mangadb entries and push into list.
                 list.push(listEntry);
             }
-            res.json(list);
+            res.status(200).send(list);
         });
     }
     refreshdb() {
-        this.app.get('/refresh', (req, res) => {
+        this.app.get('/refresh', (req, res) => __awaiter(this, void 0, void 0, function* () {
             console.log('Refresh requested.');
-            this.db.refresh();
-            res.json({ status: 'Refreshed.' });
-        });
+            let status = yield this.db.refresh();
+            if (status == true) {
+                res.status(200).send({ message: 'Refresed.' });
+            }
+        }));
     }
     editManga() {
         this.app.get('/editmanga/:edit', (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -198,18 +206,20 @@ class Server {
                     found = true;
                     this.db.mangadb[i].title = newName; //Set manga title to the new name
                     fs_1.default.rename(this.db.mangadb[i].path, this.db.dbpath + '/' + newName, (err) => {
-                        if (err)
-                            message = err && console.log(err);
+                        if (err) {
+                            message = err;
+                            console.log(err);
+                        }
                         else
                             console.log(`Successfully Edited ${ogName} -> ${newName}`);
                         this.db.refresh(); //Refresh DB
-                        if (!message)
+                        if (!message) {
                             message = 'Success';
-                        let response = {
-                            found: found,
-                            message: message
-                        };
-                        res.json(response); //Response with found = true and message being either success or rename err.
+                            res.status(200).send({ message: message }); // Full success
+                        }
+                        else {
+                            res.status(510).send({ message: message }); //Partial success. Manga was valid but rename failed.
+                        }
                     });
                 }
                 i++;
@@ -222,13 +232,13 @@ class Server {
                     found: found,
                     message: message
                 };
-                res.json(response); //Respond with found = false and manga not found.
+                res.status(411).send(response); //Respond with found = false and manga not found.
             }
         }));
     }
     upload() {
         this.app.get('/upload', (req, res) => {
-            res.json({ status: 'failed', message: `You've requested this the wrong way.` });
+            res.status(412)({ status: 'failed', message: `You've requested this the wrong way.` });
         });
         this.app.post('/upload', (req, res) => {
             if (req.files) {
@@ -237,17 +247,18 @@ class Server {
                 let filename = file.name;
                 file.mv(this.db.dbpath + '/' + filename, (err) => {
                     if (err) {
-                        res.json({ status: 'failed', message: 'Failed in file.mv()' });
+                        res.status(510).send({ status: 'failed', message: 'Failed in file.mv()' });
                         console.log('Upload Failed at mv().');
                     }
                     else {
-                        res.json({ status: 'Success', message: 'File uploaded' });
+                        res.status(200).send({ message: 'File uploaded' });
                         console.log('Upload Success');
+                        // Handle uploaded file here.
                     }
                 });
             }
             else {
-                res.json({ status: 'failed', message: 'no file uploaded.' });
+                res.status(413).send({ message: 'Failed, no file uploaded.' });
             }
         });
     }

@@ -1,3 +1,8 @@
 <h1>{{ this.manga.title }}</h1>
+<br>
+<img *ngFor='let page of this.manga.pages' src={{page}}>
 
-<img *ngFor='let page of this.manga.pages' src={{page}} fxFlex='50%'>
+<!--
+  Need a proper reading page that can scroll or click through pages etc etc.
+
+-->
