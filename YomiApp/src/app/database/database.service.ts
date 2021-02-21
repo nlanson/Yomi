@@ -10,7 +10,7 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class DatabaseService {
 
-  baseurl:string = 'http://localhost:6969'
+  baseurl:string = 'https://mdb.nlanson.ga'
 
   constructor(
     private http: HttpClient

@@ -1,6 +1,6 @@
-import e from 'express';
 import express from 'express';
 const upload = require('express-fileupload');
+const cors = require('cors');
 import fs from 'fs';
 import path from 'path';
 const unzipper = require('unzipper');
@@ -139,6 +139,7 @@ class Server {
 
     init_server() {
         this.app.use(upload());
+        this.app.use(cors());
         
         this.refreshdb();
         this.searchByTitle();
@@ -151,7 +152,7 @@ class Server {
     
     listen() { //Starts API
         this.app.listen(port, () => {
-            console.log(`Yomi Server listening at http://localhost:${port}`)
+            console.log(`Yomi Server listening at http://localhost:${port}`);
         });
     }
 

@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadValidator = void 0;
 const express_1 = __importDefault(require("express"));
 const upload = require('express-fileupload');
+const cors = require('cors');
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const unzipper = require('unzipper');
@@ -147,6 +148,7 @@ class Server {
     }
     init_server() {
         this.app.use(upload());
+        this.app.use(cors());
         this.refreshdb();
         this.searchByTitle();
         this.listdb();
