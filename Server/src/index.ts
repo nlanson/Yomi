@@ -91,6 +91,7 @@ class Database {
         return pages[0];
     }
 
+
     getPageCount(abs_path: string): Promise<number> { //Counts how many pages in a manga dir.
         return new Promise((resolve) => {
             var pages: String[] = [];
@@ -419,6 +420,7 @@ export class UploadValidator {
             }); 
         });
     }
+
 
     getPageCount(abs_path: string): Promise<number> { //Counts how many pages in a temp manga dir.
         return new Promise((resolve) => {
