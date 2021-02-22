@@ -1,3 +1,5 @@
+# This file is not regularly updated. Please refer to open issues.
+
 # Task List
 To do list. Each item on this todo list should have a corresponding issue.
 
