@@ -96,7 +96,7 @@ class Database {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('Creating DB');
             for (let i = 0; i < this.mangadb.length; i++) {
-                this.mangadb[i].pageCount = this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
+                this.mangadb[i].pageCount = yield this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
                 if (this.mangadb[i].pageCount == 0) {
                     this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
                     fs_1.default.rmdirSync(this.mangadb[i].path, { recursive: true });
@@ -112,8 +112,31 @@ class Database {
         return pages[0];
     }
     getPageCount(abs_path) {
-        //Need to ONLY return the count of files not folders.
-        return fs_1.default.readdirSync(abs_path).length;
+        return new Promise((resolve) => {
+            var pages = [];
+            fs_1.default.readdir(abs_path, (err, files) => {
+                files = files.map(function (fileName) {
+                    return {
+                        name: fileName,
+                        time: fs_1.default.statSync(abs_path + '/' + fileName).mtime.getTime()
+                    };
+                })
+                    .sort(function (a, b) {
+                    return a.time - b.time;
+                })
+                    .map(function (v) {
+                    return v.name;
+                });
+                files.forEach((file) => {
+                    let filetype = path_1.default.extname(abs_path + '/' + file);
+                    //console.log(`${file} is a ${filetype}`);
+                    if (filetype == '.jpg' || filetype == '.png' || filetype == '.jpeg') {
+                        pages.push(abs_path + '/' + file);
+                    }
+                });
+                resolve(pages.length);
+            });
+        });
     }
     makePagesArray(abs_path) {
         return new Promise((resolve) => {
@@ -266,7 +289,7 @@ class Server {
                         console.log('Upload Success');
                         //IF move is successful:
                         let filetype = path_1.default.extname(this.db.dbpath + '/' + filename); //Get file type
-                        let valid = false;
+                        let valid = { valid: false, message: 'You should not ever see this in the app. If you do contact developer.' };
                         if (filetype == '.zip') { //If file type is ZIP, the run the validateZIP function.
                             try {
                                 valid = yield this.validateZip(filename);
@@ -276,11 +299,11 @@ class Server {
                                 valid = false;
                             }
                         }
-                        if (valid == true) {
-                            res.status(200).send({ message: 'Uploaded and Unpacked' });
+                        if (valid.valid == true) {
+                            res.status(200).send({ success: valid.valid, message: valid.message });
                         }
                         else {
-                            res.status(414).send({ message: 'Uploaded but Invalid' });
+                            res.status(414).send({ success: valid.valid, message: valid.message });
                         }
                     }
                 }));
@@ -300,10 +323,10 @@ class Server {
                     //When unzipping finishes, run the validator code on the temp direcetory.
                     let validator = new UploadValidator(temp, this.db, this.db.dbpath + '/' + zipFile);
                     let valid = yield validator.validate();
-                    if (valid)
-                        resolve(true);
+                    if (valid.valid)
+                        resolve(valid);
                     else
-                        resolve(false);
+                        resolve(valid);
                 }));
             }));
         });
@@ -319,8 +342,9 @@ class UploadValidator {
         return __awaiter(this, void 0, void 0, function* () {
             let tempdb = yield this.scan_temp(); //Creates a temporary db to track files/dirs in the temp folder.
             for (let i = 0; i < tempdb.length; i++) {
-                tempdb.pageCount = this.getPageCount(tempdb[i].path);
-                if (tempdb.pageCount == 0) { //IF a directory in temp folder has no content, then remove it and delete it from the temp folder.
+                tempdb.pageCount = yield this.getPageCount(tempdb[i].path);
+                if (tempdb.pageCount == 0) {
+                    console.log(`${tempdb[i].path} is invalid`);
                     tempdb.splice(i, 1);
                     if (fs_1.default.statSync(tempdb[i].path).isDirectory()) {
                         fs_1.default.rmdirSync(tempdb[i].path, { recursive: true });
@@ -328,18 +352,20 @@ class UploadValidator {
                     continue;
                 }
             }
+            if (tempdb.length == 0)
+                return { valid: false, message: 'No valid files were detected.' };
             let mvError = yield this.mv(tempdb); //move contents of temp directory into the live database.
             if (mvError) {
                 //If the moves fails
                 console.log('Failed at mv()');
                 this.deleteZip();
-                return false;
+                return { valid: false, message: 'File move failed @UploadValidator.mv().' };
             }
             else {
                 //If the move succeeds, delete the temp folder and zip.
                 this.delelteTemp();
                 this.deleteZip();
-                return true;
+                return { valid: true, message: 'Success!' };
             }
         });
     }
@@ -353,21 +379,36 @@ class UploadValidator {
                         resolve(mangasList);
                     }
                     else {
+                        let dupe_UI = 1;
                         files.forEach((file) => {
                             let fileDir = path_1.default.join(this.temp, file);
-                            if (fs_1.default.statSync(fileDir).isDirectory()) { //If the file in this.dbpath is a directory, add to the mangas list.
-                                mangasList.push({
-                                    title: file,
-                                    path: fileDir
-                                });
+                            if (fs_1.default.statSync(fileDir).isDirectory()) { //If the file in this.dbpath is a directory, do the dupe detection.  
+                                //Dupe Detection Loop. Checks if there are any dupes in the real db.
+                                let inval = false;
+                                do {
+                                    if (!this.checkForInvalidFileName(file)) {
+                                        inval = false;
+                                        mangasList.push({
+                                            title: file,
+                                            path: fileDir
+                                        });
+                                    }
+                                    else {
+                                        inval = true;
+                                        console.log(`${file} is an invalid name.`);
+                                        file = file + `(${dupe_UI.toString()})`;
+                                        dupe_UI++;
+                                    }
+                                } while (inval == true);
                             }
-                            else {
+                            else { // If the file is not a directory purge it,
                                 fs_1.default.unlink(fileDir, (err) => {
                                     if (err)
                                         console.log(err);
                                 });
                             }
                         });
+                        //Return the mangas list. (Shouldnt have any dupes)
                         resolve(mangasList);
                     }
                 });
@@ -375,7 +416,30 @@ class UploadValidator {
         });
     }
     getPageCount(abs_path) {
-        return fs_1.default.readdirSync(abs_path).length;
+        return new Promise((resolve) => {
+            var pages = [];
+            fs_1.default.readdir(abs_path, (err, files) => {
+                files = files.map(function (fileName) {
+                    return {
+                        name: fileName,
+                        time: fs_1.default.statSync(abs_path + '/' + fileName).mtime.getTime()
+                    };
+                })
+                    .sort(function (a, b) {
+                    return a.time - b.time;
+                })
+                    .map(function (v) {
+                    return v.name;
+                });
+                files.forEach((file) => {
+                    let filetype = path_1.default.extname(abs_path + '/' + file);
+                    if (filetype == '.jpg' || '.png' || '.jpeg') {
+                        pages.push(abs_path + '/' + file);
+                    }
+                });
+                resolve(pages.length);
+            });
+        });
     }
     mv(tempdb) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -409,6 +473,17 @@ class UploadValidator {
                     console.log(err);
             });
         });
+    }
+    checkForInvalidFileName(title) {
+        let i = 0;
+        let found = false;
+        while (i < this.real.mangadb.length && found == false) {
+            if ((this.real.mangadb[i].title == title) || (title == 'temp')) {
+                found = true;
+            }
+            i++;
+        }
+        return found;
     }
 }
 exports.UploadValidator = UploadValidator;
