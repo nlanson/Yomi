@@ -14,7 +14,8 @@ export class UploadMangaComponent implements OnInit {
   uploadForm: FormGroup;
   file: File = null;
   progress: number = 0;
-  Math = Math
+  Math = Math;
+  message: string;
 
   constructor(
     private db: DatabaseService,
@@ -28,6 +29,7 @@ export class UploadMangaComponent implements OnInit {
   }
 
   async submit() {
+    this.message = undefined;
     let res = this.db.uploadManga(this.file);
     res.subscribe(
       (event: any) => {
@@ -39,12 +41,14 @@ export class UploadMangaComponent implements OnInit {
           console.log(message);
 
           //Handle post upload success here.
-
+          this.progress = 0;
+          this.message = 'Upload Complete!'
         }
       },
       err => {
         this.progress = 0;
         console.log(err);
+        this.message = 'Failed';
       }
     );
   }

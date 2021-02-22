@@ -8,7 +8,10 @@
 </form>
 <br>
 <div *ngIf='progress != 0'>
-  <h3> Progress: {{progress}}%</h3>
-  <mat-progress-bar mode="determinate" value="{{this.progress}}" color='warn'></mat-progress-bar>
-  <h4 *ngIf='progress == 100'> Upload Complete </h4>
+
+    <h3> Upload Progress: {{progress}}%</h3>
+    <mat-progress-bar mode="determinate" value="{{this.progress}}" color='warn' *ngIf='progress != 100'></mat-progress-bar>
+    <mat-progress-bar mode='indeterminate' color='warn' *ngIf='progress == 100'></mat-progress-bar>
+    <h4 *ngIf='message'> {{message}} </h4>
+
 </div>
