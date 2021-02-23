@@ -133,6 +133,7 @@ class Database {
         return new Promise((resolve) => {
             var pages: String[] = [];
             fs.readdir(abs_path, (err, files) => {
+                //Sort pages by time
                 files = files.map(function (fileName) {
                     return {
                         name: fileName,
@@ -146,8 +147,17 @@ class Database {
                 });
                 
                 files.forEach((file) => {
-                    //TODO: Only push jpg, png or jpeg file types as often manga downloaded contains ads in pdf or html format.
-                    pages.push(abs_path + '/' + file);
+                    let filetype = path.extname(abs_path + '/' + file);
+                    if( //List all accepted page types here.
+                        filetype == '.jpg' ||
+                        filetype == '.JPG' ||
+                        filetype == '.png' ||
+                        filetype == '.PNG' ||
+                        filetype == '.jpeg' ||
+                        filetype == '.JPEG' 
+                        ) {
+                        pages.push(abs_path + '/' + file);
+                    }
                 });
                 resolve(pages);
             }); 
