@@ -58,6 +58,7 @@ class Database {
                                 path: fileDir
                             });
                         } else {
+                            console.log(`Deleting ${file} as it is not a directory.`)
                             fs.unlink(fileDir, (err) => {
                                 if (err) console.log(err)
                             })
@@ -76,8 +77,9 @@ class Database {
         for ( let i = 0; i < this.mangadb.length; i++ ) {
             this.mangadb[i].pageCount = await this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
             if ( this.mangadb[i].pageCount == 0 ) {
-                this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
+                console.log(`Deleting ${this.mangadb[i].title} as it has a page count of zero.`)
                 fs.rmdirSync(this.mangadb[i].path, { recursive: true });
+                this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
                 continue
             }
 
@@ -111,7 +113,14 @@ class Database {
                 files.forEach((file) => {
                     let filetype = path.extname(abs_path + '/' + file);
                         //console.log(`${file} is a ${filetype}`);
-                        if(filetype == '.jpg' ||filetype == '.png' ||filetype == '.jpeg') {
+                        if( //List all accepted page types here.
+                            filetype == '.jpg' ||
+                            filetype == '.JPG' ||
+                            filetype == '.png' ||
+                            filetype == '.PNG' ||
+                            filetype == '.jpeg' ||
+                            filetype == '.JPEG' 
+                            ) {
                             pages.push(abs_path + '/' + file);
                         }
                 });
@@ -287,7 +296,7 @@ class Server {
                         console.log('Upload Failed at mv().');
                     }
                     else { 
-                        console.log('Upload Success')
+                        console.log('Upload Success');
 
                         //IF move is successful:
                         let filetype = path.extname(this.db.dbpath + '/' + filename); //Get file type
@@ -297,14 +306,18 @@ class Server {
                                 valid = await this.validateZip(filename)
                             } catch(error) {
                                 console.log(error);
-                                valid = false;
+                                valid = { valid: false, message: error };
                             }
-                        } 
+                        } else { //If the file is not a zip reject. Can also add support for other file types here if needed.
+                            valid = { valid: false, message: `${filetype} is not supported. Please try using .zip` }
+                        }
 
                         if ( valid.valid == true ) {
                             res.status(200).send({success: valid.valid, message: valid.message});
-                        } else {
+                        } else if ( valid.valid == false ) {
                             res.status(414).send({success: valid.valid, message: valid.message});
+                        } else { //If valid is undefined for some reason.
+                            res.status(415).send({success: false, message: 'Validator null'});
                         }
                     }
                 })
@@ -332,11 +345,12 @@ class Server {
 
 }//END Server Class
 
+//Validates Uploaded files. 
 export class UploadValidator {
 
-    temp: string;
-    real: Database;
-    zip: string;
+    temp: string; //Path to temp folder with unarchived manga.
+    real: Database; //Real database.
+    zip: string; //Zip file path to delete zip on successful upload.
     
     constructor(
         temp: string,
@@ -440,7 +454,14 @@ export class UploadValidator {
                 
                 files.forEach((file) => {
                     let filetype = path.extname(abs_path + '/' + file);
-                        if(filetype == '.jpg' || '.png' || '.jpeg') {
+                        if(
+                            filetype == '.jpg' ||
+                            filetype == '.JPG' ||
+                            filetype == '.png' ||
+                            filetype == '.PNG' ||
+                            filetype == '.jpeg' ||
+                            filetype == '.JPEG'
+                            ) {
                             pages.push(abs_path + '/' + file);
                         }
                 });

@@ -79,6 +79,7 @@ class Database {
                             });
                         }
                         else {
+                            console.log(`Deleting ${file} as it is not a directory.`);
                             fs_1.default.unlink(fileDir, (err) => {
                                 if (err)
                                     console.log(err);
@@ -98,8 +99,9 @@ class Database {
             for (let i = 0; i < this.mangadb.length; i++) {
                 this.mangadb[i].pageCount = yield this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
                 if (this.mangadb[i].pageCount == 0) {
-                    this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
+                    console.log(`Deleting ${this.mangadb[i].title} as it has a page count of zero.`);
                     fs_1.default.rmdirSync(this.mangadb[i].path, { recursive: true });
+                    this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
                     continue;
                 }
                 this.mangadb[i].pages = yield this.makePagesArray(this.mangadb[i].path); //Create an array of pages and their directories.
@@ -130,7 +132,13 @@ class Database {
                 files.forEach((file) => {
                     let filetype = path_1.default.extname(abs_path + '/' + file);
                     //console.log(`${file} is a ${filetype}`);
-                    if (filetype == '.jpg' || filetype == '.png' || filetype == '.jpeg') {
+                    if ( //List all accepted page types here.
+                    filetype == '.jpg' ||
+                        filetype == '.JPG' ||
+                        filetype == '.png' ||
+                        filetype == '.PNG' ||
+                        filetype == '.jpeg' ||
+                        filetype == '.JPEG') {
                         pages.push(abs_path + '/' + file);
                     }
                 });
@@ -296,14 +304,20 @@ class Server {
                             }
                             catch (error) {
                                 console.log(error);
-                                valid = false;
+                                valid = { valid: false, message: error };
                             }
+                        }
+                        else { //If the file is not a zip reject. Can also add support for other file types here if needed.
+                            valid = { valid: false, message: `${filetype} is not supported. Please try using .zip` };
                         }
                         if (valid.valid == true) {
                             res.status(200).send({ success: valid.valid, message: valid.message });
                         }
-                        else {
+                        else if (valid.valid == false) {
                             res.status(414).send({ success: valid.valid, message: valid.message });
+                        }
+                        else { //If valid is undefined for some reason.
+                            res.status(415).send({ success: false, message: 'Validator null' });
                         }
                     }
                 }));
@@ -332,6 +346,7 @@ class Server {
         });
     }
 } //END Server Class
+//Validates Uploaded files. 
 class UploadValidator {
     constructor(temp, real, zip) {
         this.temp = temp;
@@ -433,7 +448,12 @@ class UploadValidator {
                 });
                 files.forEach((file) => {
                     let filetype = path_1.default.extname(abs_path + '/' + file);
-                    if (filetype == '.jpg' || '.png' || '.jpeg') {
+                    if (filetype == '.jpg' ||
+                        filetype == '.JPG' ||
+                        filetype == '.png' ||
+                        filetype == '.PNG' ||
+                        filetype == '.jpeg' ||
+                        filetype == '.JPEG') {
                         pages.push(abs_path + '/' + file);
                     }
                 });
