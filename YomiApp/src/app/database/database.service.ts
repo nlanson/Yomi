@@ -10,8 +10,8 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class DatabaseService {
 
-  //baseurl:string = 'https://mdb.nlanson.ga' //Production
-  baseurl: string = 'http://localhost:6969' //Local Dev
+  baseurl:string = 'https://mdb.nlanson.ga' //Production
+  //baseurl: string = 'http://localhost:6969' //Local Dev
 
   constructor(
     private http: HttpClient
@@ -57,6 +57,18 @@ export class DatabaseService {
   //Not finalised
   uploadManga(file: File) {
     let url = this.baseurl + '/upload';
+    let fd = new FormData();
+    fd.append('file', file, file.name);
+
+    return this.http.post(url, fd, {
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
+
+  uploadv2(file: File) {
+    console.log('UPLOAD2 CALLED');
+    let url = this.baseurl + '/uploadv2';
     let fd = new FormData();
     fd.append('file', file, file.name);
 

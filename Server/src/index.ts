@@ -2,6 +2,7 @@ import express from 'express';
 const upload = require('express-fileupload');
 const cors = require('cors');
 import fs from 'fs';
+const fsPromises = fs.promises;
 import path from 'path';
 const unzipper = require('unzipper');
 
@@ -175,7 +176,8 @@ class Server {
         this.searchByTitle();
         this.listdb();
         this.editManga();
-        this.upload();
+        this.upload(); //REPLACED WITH uploadv2();
+        this.uploadv2();
 
         this.listen();
     }
@@ -202,7 +204,7 @@ class Server {
                 i++
             }
 
-            if ( found == false ) res.status(411).send({message: 'Manga not found'});
+            if ( found == false ) res.status(404).send({message: 'Manga not found'});
         });
     }
 
@@ -256,7 +258,7 @@ class Server {
                             message = 'Success';
                             res.status(200).send({message: message}); // Full success
                         } else{
-                            res.status(510).send({message: message}); //Partial success. Manga was valid but rename failed.
+                            res.status(500).send({message: message}); //Partial success. Manga was valid but rename failed.
                         }
                         
                     });
@@ -272,14 +274,15 @@ class Server {
                     found: found,
                     message: message
                 }
-                res.status(411).send(response); //Respond with found = false and manga not found.
+                res.status(404).send(response); //Respond with found = false and manga not found.
             }
         });
     }
 
+    //REPLACED WITH uploadv2();
     upload() {
         this.app.get('/upload', (req: any, res: any) => {
-            res.status(412)({status: 'failed', message: `You've requested this the wrong way.`})
+            res.status(405)({status: 'failed', message: `You've requested this the wrong way.`})
         })
         
         this.app.post('/upload', (req: any, res: any) => {
@@ -290,7 +293,7 @@ class Server {
 
                 file.mv(this.db.dbpath + '/' + filename, async (err: any) => { //Move received upload to dbpath/upload.zip
                     if(err) { //If move fails return error
-                        res.status(510).send({status: 'failed', message: 'Failed in file.mv()'});
+                        res.status(500).send({status: 'failed', message: 'Failed in file.mv()'});
                         console.log('Upload Failed at mv().');
                     }
                     else { 
@@ -313,9 +316,9 @@ class Server {
                         if ( valid.valid == true ) {
                             res.status(200).send({success: valid.valid, message: valid.message});
                         } else if ( valid.valid == false ) {
-                            res.status(414).send({success: valid.valid, message: valid.message});
+                            res.status(406).send({success: valid.valid, message: valid.message});
                         } else { //If valid is undefined for some reason.
-                            res.status(415).send({success: false, message: 'Validator null'});
+                            res.status(500).send({success: false, message: 'Validator null'});
                         }
                     }
                 })
@@ -323,6 +326,48 @@ class Server {
                 res.status(413).send({message: 'Failed, no file uploaded.'})
             }
         })
+    }
+
+    uploadv2() {
+        this.app.get('/uploadv2', (req: any, res: any) => {
+            res.status(405)({status: 'failed', message: `You've requested this the wrong way.`})
+        })
+        
+        this.app.post('/uploadv2', (req: any, res: any) => {
+            if ( req.files ) {
+                console.log('Recieving Upload...')
+                let file = req.files.file;
+                let filename = file.name;
+
+                file.mv(this.db.dbpath + '/' + filename, async (err: any) => { //Move received upload to dbpath/upload.zip
+                    if(err) { //If move fails return error
+                        res.status(510).send({status: 'failed', message: 'Failed recieving the file properly.'});
+                        console.log('Upload Failed at mv().');
+                    }
+                    else { 
+                        console.log('Upload Success');
+
+                        //IF move is successful:
+                        let archive = this.db.dbpath + '/' + filename;
+                        let uh = new UploadHandler(archive, this.db);
+                        let result = await uh.handle();
+
+                        switch (result.success) {
+                            case ( true ):
+                                res.status(200).send(result);
+                                break;
+                            case ( false ):
+                                res.status(200).send(result);
+                                break;
+                            default:
+                                res.status(500).send({success: false, message: 'Handler failed to run.'});
+                        }
+                    }
+                })
+            } else {
+                res.status(406).send({message: 'Failed, no file uploaded.'})
+            }
+        });
     }
 
     async validateZip(zipFile: String): Promise<any> { //Extracts and validates the uploaded zip file.
@@ -429,8 +474,11 @@ export class UploadValidator {
                     //Return the mangas list. (Shouldnt have any dupes)
                     resolve(mangasList);
                 }
+            
             }); 
         });
+
+        
     }
 
 
@@ -497,6 +545,271 @@ export class UploadValidator {
         }
 
         return found;
+    }
+
+}
+
+
+interface CommonHandlerResult {
+    success: Boolean,
+    message: string
+}
+
+class UploadHandler {
+
+    file: string;
+    filetype: string;
+    db: Database;
+    temp: string;
+    tempdb: Array<any> = [];
+
+    constructor(
+        file: string,
+        db: Database
+    ) {
+        this.file = file;
+        this.db = db;
+        this.temp = this.db.dbpath + '/temp/';
+        this.filetype = this.getFileType();
+    }
+
+    //Method to call.
+    async handle(): Promise<CommonHandlerResult> {
+        console.log(`[DEBUG] handler() entered`);
+        let response: CommonHandlerResult = {success: false, message: 'unhandled.'}
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.unarchive();
+            } catch (error) {
+                console.log(error.message);
+                response.success = false;
+                response.message = error.message;
+                resolve(response);
+            }
+
+            try {
+                await this.scan_temp();
+                if ( this.tempdb.length == 0 ) {
+                    response.success = false;
+                    response.message = 'No valid files were in the archive.'
+                    resolve(response);
+                }
+            } catch (e) {
+                console.log(e.message);
+                response.success = false;
+                response.message = e.message;
+                resolve(response);
+            }
+
+            try {
+                await this.pageValidator();
+                if ( this.tempdb.length == 0 ) {
+                    response.success = false;
+                    response.message = 'No valid files were in the archive.'
+                    resolve(response);
+                }
+            } catch (e) {
+                console.log(e.message);
+                response.success = false;
+                response.message = e.message;
+                resolve(response);
+            }
+
+            try {
+                await this.mv();
+            } catch (e) {
+                console.log(e.message);
+                response.success = false;
+                response.message = 'No valid files were in the archive.'
+                resolve(response);
+            }
+
+            try {
+                this.deleteDir(this.temp);
+                this.deleteFile(this.file);
+            } catch (e) {
+                console.log(e.message);
+                response.success = false;
+                response.message = 'No valid files were in the archive.'
+                resolve(response);
+            }
+
+            response.success = true;
+            response.message = 'Uploaded and Unpacked';
+            resolve(response);
+
+        });
+    }
+
+    getFileType() {
+        let filetype = path.extname(this.file);
+        return filetype;
+    }
+
+    async unarchive(): Promise<CommonHandlerResult> {
+        console.log(`[DEBUG] unarchive() entered`);
+        return new Promise( async (resolve, reject) => {
+            let result: CommonHandlerResult = { success: false, message: 'unarchiver failure'}
+            switch ( this.filetype ) {
+                case('.zip'):
+                    result = await this.unzip();
+                    resolve(result);
+                    break;
+                default:
+                    reject(new Error(`Unsupported file type "${this.filetype}"`))
+            }
+        });
+    }
+
+    async unzip(): Promise<CommonHandlerResult> {
+        console.log(`[DEBUG] unzip() entered`);
+        return new Promise( async (resolve, reject) => {
+            const zip = await fs.createReadStream(this.file) //Extract ZIP to /temp/ folder.
+                .pipe(unzipper.Extract({ path: this.temp }))
+                .on('close', async () => {
+                    let result = { success: true, message: 'Unzipped.'}
+                    resolve(result);
+                })
+                .on('error', async () => {
+                    reject(new Error('Unzipping read stream gave an error.'))
+                });
+        });
+    }
+    
+    async scan_temp(): Promise<CommonHandlerResult> {
+        console.log(`[DEBUG] scantemp() entered`);
+        return new Promise(async (resolve, reject) => {
+            let files = await fsPromises.readdir(this.temp);
+            for await (let file of files) {
+                console.log(file);
+                let fileDir = path.join(this.temp, file);
+                //If the file in this.dbpath is a directory, do the dupe detection.  
+                if ( fs.statSync(fileDir).isDirectory() ) {       
+                    //Dupe Detection Loop. Checks if there are any dupes in the real db.
+                    let inval = false;
+                    let dupe_UI = 1;
+                    do {
+                        let check = await this.checkForInvalidFileName(file);
+                        if ( !check ) {
+                            //If the directory is not a duplicate, add it to the tempdb.
+                            inval = false;
+                            this.tempdb.push({
+                                title: file,
+                                path: fileDir
+                            });
+                        } else {
+                            //If the directory is a dupe, tag it with the dupe_UI and reloop.
+                            inval = true;
+                            console.log(`${file} is an invalid name.`);
+                            file = file + `(${dupe_UI.toString()})`;
+                            dupe_UI++
+                        }
+                    } while ( inval == true );
+                } else { 
+                    // If the file is not a directory purge it,
+                    fs.unlink(fileDir, (err) => {
+                        if (err) reject(new Error(`fs.unlink() gave an error while deleting ${file}`));
+                    });
+                }
+            }
+            resolve({success: true, message: 'Temp scanned'});
+        });
+    }
+
+    async checkForInvalidFileName(title: string): Promise<Boolean> {
+        console.log(`[DEBUG] checkForInvalidFileName() entered. Checking for ${title}`);
+        return new Promise((resolve, reject) => {
+            let i=0;
+            let found: Boolean = false;
+
+            while ( i<this.db.mangadb.length && found == false ) {
+                if ( (this.db.mangadb[i].title == title) || (title == 'temp')) {
+                    found = true;
+                }
+                i++
+            }
+
+            resolve(found);
+        })
+    }
+
+    async pageValidator(): Promise<CommonHandlerResult> {
+        console.log(`[DEBUG] pageValidator() entered`);
+        return new Promise( async (resolve, reject) => {
+            for ( let i=0; i < this.tempdb.length; i++ ) {
+                try {
+                    if ( fs.statSync(this.tempdb[i].path).isDirectory() ) {
+                        this.tempdb[i].pageCount = await this.getPageCount(this.tempdb[i].path); 
+                    }
+                } catch (e) {
+                    console.log(e.message);
+                    reject(new Error(e.message));
+                }
+
+                if ( this.tempdb[i].pageCount == 0 ) { 
+                    console.log(`${this.tempdb[i].path} has no valid pages.`)
+                    if ( fs.statSync(this.tempdb[i].path).isDirectory() ) {
+                        fs.rmdirSync(this.tempdb[i].path, { recursive: true });
+                    }
+                    this.tempdb.splice(i, 1); 
+                    continue
+                }
+            }
+            let response = { success: true, message: 'Pages Validated' }
+            resolve(response)
+        })
+    }
+
+    getPageCount(manga_path: string): Promise<number> { //Counts how many pages in a temp manga dir.
+        console.log(`[DEBUG] getPageCount() entered`);
+        return new Promise((resolve, reject) => {
+            var pages: number = 0;
+            fs.readdir(manga_path, (err, files) => {
+                if (err) reject(new Error('fs.readdir() threw an error whilst counting pages.'));
+                files.forEach((file) => { //Only push images
+                    let filetype = path.extname(this.temp + '/' + file);
+                        if(
+                            filetype == '.jpg' ||
+                            filetype == '.JPG' ||
+                            filetype == '.png' ||
+                            filetype == '.PNG' ||
+                            filetype == '.jpeg' ||
+                            filetype == '.JPEG'
+                            ) {
+                            pages++
+                        }
+                });
+                resolve(pages);
+            }); 
+        });
+    }
+
+    async mv(): Promise<CommonHandlerResult> {
+        console.log(`[DEBUG] mv() entered ${this.tempdb.length}`);
+        return new Promise((resolve, reject) => {
+            for ( let i=0; i < this.tempdb.length; i++ ) {
+                fs.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title, (err) => {
+                    if (err) reject(new Error(`Failed migrating ${this.tempdb[i].path} to live database.`))
+                });
+            }
+    
+            let response: CommonHandlerResult = { success: true, message: 'Move successful.' }
+            resolve(response);
+        });   
+    }
+
+    deleteDir(dir: string) {
+        console.log(`[DEBUG] deleteDir() entered`);
+        fs.rmdir(dir, (err) => {
+            if (err) throw new Error(`Directory ${dir} could not be deleted: ${err}`);
+        });
+    }
+
+    deleteFile(file: string) {
+        console.log(`[DEBUG] deleteFile() entered`);
+        fs.unlink(file, (err) => {
+            if (err) throw new Error(`File ${file} could not be deleted: ${err}`);
+        })
     }
 
 }

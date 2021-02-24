@@ -39,7 +39,7 @@ export class UploadMangaComponent implements OnInit {
     this.dialogRef.disableClose = true; //Disable component closing whilst uploading.
     this.uploading = true;
 
-    let res = this.db.uploadManga(this.file);
+    let res = this.db.uploadv2(this.file); //USING NEW UPLOAD METHOD
     res.subscribe(
       (event: any) => {
         if ( event.type === HttpEventType.UploadProgress ) {
