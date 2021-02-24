@@ -117,18 +117,6 @@ class Database {
         return new Promise((resolve) => {
             var pages = [];
             fs_1.default.readdir(abs_path, (err, files) => {
-                files = files.map(function (fileName) {
-                    return {
-                        name: fileName,
-                        time: fs_1.default.statSync(abs_path + '/' + fileName).mtime.getTime()
-                    };
-                })
-                    .sort(function (a, b) {
-                    return a.time - b.time;
-                })
-                    .map(function (v) {
-                    return v.name;
-                });
                 files.forEach((file) => {
                     let filetype = path_1.default.extname(abs_path + '/' + file);
                     //console.log(`${file} is a ${filetype}`);
@@ -150,6 +138,7 @@ class Database {
         return new Promise((resolve) => {
             var pages = [];
             fs_1.default.readdir(abs_path, (err, files) => {
+                //Sort pages by time
                 files = files.map(function (fileName) {
                     return {
                         name: fileName,
@@ -163,8 +152,16 @@ class Database {
                     return v.name;
                 });
                 files.forEach((file) => {
-                    //TODO: Only push jpg, png or jpeg file types as often manga downloaded contains ads in pdf or html format.
-                    pages.push(abs_path + '/' + file);
+                    let filetype = path_1.default.extname(abs_path + '/' + file);
+                    if ( //List all accepted page types here.
+                    filetype == '.jpg' ||
+                        filetype == '.JPG' ||
+                        filetype == '.png' ||
+                        filetype == '.PNG' ||
+                        filetype == '.jpeg' ||
+                        filetype == '.JPEG') {
+                        pages.push(abs_path + '/' + file);
+                    }
                 });
                 resolve(pages);
             });
@@ -434,18 +431,6 @@ class UploadValidator {
         return new Promise((resolve) => {
             var pages = [];
             fs_1.default.readdir(abs_path, (err, files) => {
-                files = files.map(function (fileName) {
-                    return {
-                        name: fileName,
-                        time: fs_1.default.statSync(abs_path + '/' + fileName).mtime.getTime()
-                    };
-                })
-                    .sort(function (a, b) {
-                    return a.time - b.time;
-                })
-                    .map(function (v) {
-                    return v.name;
-                });
                 files.forEach((file) => {
                     let filetype = path_1.default.extname(abs_path + '/' + file);
                     if (filetype == '.jpg' ||

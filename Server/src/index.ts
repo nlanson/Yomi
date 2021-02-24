@@ -325,7 +325,7 @@ class Server {
         })
     }
 
-    async validateZip(zipFile: String): Promise<any> { //Validates the uploaded zip file.
+    async validateZip(zipFile: String): Promise<any> { //Extracts and validates the uploaded zip file.
         return new Promise(async (resolve, reject) => {
             let temp = this.db.dbpath + '/temp/';
             const zip = await fs.createReadStream(this.db.dbpath + '/' + zipFile) //Extract ZIP to /temp/ folder.
