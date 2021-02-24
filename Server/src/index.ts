@@ -450,19 +450,7 @@ export class UploadValidator {
         return new Promise((resolve) => {
             var pages: String[] = [];
             fs.readdir(abs_path, (err, files) => {
-                files = files.map(function (fileName) {
-                    return {
-                        name: fileName,
-                        time: fs.statSync(abs_path + '/' + fileName).mtime.getTime()
-                    };
-                })
-                .sort(function (a, b) {
-                    return a.time - b.time; })
-                .map(function (v) {
-                    return v.name;
-                });
-                
-                files.forEach((file) => {
+                files.forEach((file) => { //Only push images
                     let filetype = path.extname(abs_path + '/' + file);
                         if(
                             filetype == '.jpg' ||
