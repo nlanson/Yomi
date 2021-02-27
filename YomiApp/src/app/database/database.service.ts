@@ -54,21 +54,8 @@ export class DatabaseService {
     return res;
   }
 
-  //Not finalised
-  uploadManga(file: File) {
+  upload(file: File) {
     let url = this.baseurl + '/upload';
-    let fd = new FormData();
-    fd.append('file', file, file.name);
-
-    return this.http.post(url, fd, {
-      reportProgress: true,
-      observe: 'events'
-    });
-  }
-
-  uploadv2(file: File) {
-    console.log('UPLOAD2 CALLED');
-    let url = this.baseurl + '/uploadv2';
     let fd = new FormData();
     fd.append('file', file, file.name);
 
