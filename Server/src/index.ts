@@ -584,7 +584,7 @@ async function main() {
     let prodPath = '/data/manga';
     let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
 
-    var dbpath = devPath;
+    var dbpath = prodPath;
     var db = new Database(dbpath);
     await db.setup();
     
