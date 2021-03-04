@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 const upload = require('express-fileupload');
 const cors = require('cors');
 import fs from 'fs';
@@ -177,6 +177,7 @@ class Server {
         this.listdb();
         this.editManga();
         this.upload();
+        this.deleteManga();
 
         this.listen();
     }
@@ -203,7 +204,7 @@ class Server {
                 i++
             }
 
-            if ( found == false ) res.status(404).send({message: 'Manga not found'});
+            if ( found == false ) res.status(404).send({success: false, message: 'Manga not found'});
         });
     }
 
@@ -227,7 +228,7 @@ class Server {
             let status = await this.db.refresh();
 
             if ( status == true ) {
-                res.status(200).send({message: 'Refresed.'});
+                res.status(200).send({success: true, message: 'Refresed.'});
             }
         })
     }
@@ -255,9 +256,9 @@ class Server {
                         
                         if (!message) { 
                             message = 'Success';
-                            res.status(200).send({message: message}); // Full success
+                            res.status(200).send({success: true, message: message}); // Full success
                         } else{
-                            res.status(500).send({message: message}); //Partial success. Manga was valid but rename failed.
+                            res.status(500).send({success: false, message: message}); //Partial success. Manga was valid but rename failed.
                         }
                         
                     });
@@ -270,7 +271,7 @@ class Server {
                 console.log('Edit is Invalid');
                 message = 'Manga not found';
                 let response = {
-                    found: found,
+                    success: found,
                     message: message
                 }
                 res.status(404).send(response); //Respond with found = false and manga not found.
@@ -291,7 +292,7 @@ class Server {
 
                 file.mv(this.db.dbpath + '/' + filename, async (err: any) => { //Move received upload to dbpath/upload.zip
                     if(err) { //If move fails return error
-                        res.status(510).send({status: 'failed', message: 'Failed recieving the file properly.'});
+                        res.status(510).send({success: false, message: 'Failed recieving the file properly.'});
                         console.log('Upload Failed at mv().');
                     }
                     else { 
@@ -315,8 +316,21 @@ class Server {
                     }
                 })
             } else {
-                res.status(406).send({message: 'Failed, no file uploaded.'})
+                res.status(406).send({success: false, message: 'Failed, no file uploaded.'})
             }
+        });
+    }
+
+    async deleteManga() {
+        this.app.get('/deletemanga/:delete', async (req: Request, res: Response) => {
+            console.log('Delete Requested');
+            let del: any = req.params.delete;
+            del = JSON.parse(del);
+            del = del.title;
+
+            await fsPromises.rmdir(this.db.dbpath + '/' + del, { recursive: true });
+
+            res.status(200).send({success: true, message: `${del} was deleted.`});
         });
     }
 

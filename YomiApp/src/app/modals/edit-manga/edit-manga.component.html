@@ -1,12 +1,15 @@
 <h1> Edit Manga </h1>
 <h5 class='subheading'>Title: {{data.title}}</h5>
 
+
 <form [formGroup]='editForm' (ngSubmit)='submit()'>
   <mat-form-field appearance="fill" required>
     <mat-label>Edit Name</mat-label>
     <input matInput formControlName="edit">
   </mat-form-field>
   <div mat-dialog-actions>
-    <button mat-raised-button type='submit' color='primary'>Submit</button>
+    <button mat-raised-button type='submit' color='primary'>
+      Submit
+    </button>
   </div>
 </form>

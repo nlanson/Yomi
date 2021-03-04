@@ -8,11 +8,15 @@
       <mat-card class="mat-elevation-z4">
         <mat-card-header>
           <mat-card-title>{{manga.title}}</mat-card-title>
-          <mat-card-subtitle>{{manga.pageCount}} Pages</mat-card-subtitle>
+          <button mat-icon-button [matMenuTriggerFor]="menu" class='mangaMenu'><mat-icon>more_vert</mat-icon></button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)='showInfo(manga.title)'>Info</button>
+            <button mat-menu-item (click)='deleteManga(manga.title)'>Delete</button>
+          </mat-menu>
         </mat-card-header>
         <img mat-card-image src="{{manga.cover}}" class='coverImage'>
         <mat-card-footer>
-          <button mat-raised-button class='actionButtons' (click)="openEdit(manga.title)">EDIT</button> <!--See Notes Below-->
+          <button mat-raised-button class='actionButtons' (click)="openEdit(manga.title)">EDIT</button>
           <button mat-raised-button color='primary' class='actionButtons' (click)='read(manga.title)'>READ</button>
         </mat-card-footer>
       </mat-card>
@@ -21,3 +25,6 @@
 </div>
 <br>
 <button mat-raised-button (click)='openUpload()' color='primary'>Upload</button>
+
+
+

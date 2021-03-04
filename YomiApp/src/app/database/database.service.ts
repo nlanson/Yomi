@@ -10,14 +10,15 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class DatabaseService {
 
-  //baseurl:string = 'https://mdb.nlanson.ga' //Production
-  baseurl: string = 'http://localhost:6969' //Local Dev
+  //baseurl:string = 'https://mdb.nlanson.ga' //Personal Production URL
+  baseurl: string = 'http://localhost:6969' //Docker URL
 
   constructor(
     private http: HttpClient
   ) { }
 
   async getList(): Promise<any> {
+    await this.refreshdb();
     let url = this.baseurl + '/list';
     let list = await this.http.get(url, {observe: 'response'}).toPromise();
 
@@ -63,6 +64,15 @@ export class DatabaseService {
       reportProgress: true,
       observe: 'events'
     });
+  }
+
+  async delete(title: string): Promise<any> {
+    let delobj = {title: title};
+    let delString = JSON.stringify(delobj);
+    let url = this.baseurl + '/deleteManga/' + delString;
+    let res: any = await this.http.get(url, {observe: 'response'}).toPromise();
+
+    return res;
   }
 
 

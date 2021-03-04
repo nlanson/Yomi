@@ -189,6 +189,7 @@ class Server {
         this.listdb();
         this.editManga();
         this.upload();
+        this.deleteManga();
         this.listen();
     }
     listen() {
@@ -211,7 +212,7 @@ class Server {
                 i++;
             }
             if (found == false)
-                res.status(404).send({ message: 'Manga not found' });
+                res.status(404).send({ success: false, message: 'Manga not found' });
         });
     }
     listdb() {
@@ -234,7 +235,7 @@ class Server {
             console.log('Refresh requested.');
             let status = yield this.db.refresh();
             if (status == true) {
-                res.status(200).send({ message: 'Refresed.' });
+                res.status(200).send({ success: true, message: 'Refresed.' });
             }
         }));
     }
@@ -262,10 +263,10 @@ class Server {
                         this.db.refresh(); //Refresh DB
                         if (!message) {
                             message = 'Success';
-                            res.status(200).send({ message: message }); // Full success
+                            res.status(200).send({ success: true, message: message }); // Full success
                         }
                         else {
-                            res.status(500).send({ message: message }); //Partial success. Manga was valid but rename failed.
+                            res.status(500).send({ success: false, message: message }); //Partial success. Manga was valid but rename failed.
                         }
                     });
                 }
@@ -276,7 +277,7 @@ class Server {
                 console.log('Edit is Invalid');
                 message = 'Manga not found';
                 let response = {
-                    found: found,
+                    success: found,
                     message: message
                 };
                 res.status(404).send(response); //Respond with found = false and manga not found.
@@ -294,7 +295,7 @@ class Server {
                 let filename = file.name;
                 file.mv(this.db.dbpath + '/' + filename, (err) => __awaiter(this, void 0, void 0, function* () {
                     if (err) { //If move fails return error
-                        res.status(510).send({ status: 'failed', message: 'Failed recieving the file properly.' });
+                        res.status(510).send({ success: false, message: 'Failed recieving the file properly.' });
                         console.log('Upload Failed at mv().');
                     }
                     else {
@@ -317,8 +318,20 @@ class Server {
                 }));
             }
             else {
-                res.status(406).send({ message: 'Failed, no file uploaded.' });
+                res.status(406).send({ success: false, message: 'Failed, no file uploaded.' });
             }
+        });
+    }
+    deleteManga() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.app.get('/deletemanga/:delete', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                console.log('Delete Requested');
+                let del = req.params.delete;
+                del = JSON.parse(del);
+                del = del.title;
+                yield fsPromises.rmdir(this.db.dbpath + '/' + del, { recursive: true });
+                res.status(200).send({ success: true, message: `${del} was deleted.` });
+            }));
         });
     }
 } //END Server Class

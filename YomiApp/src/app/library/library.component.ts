@@ -3,10 +3,12 @@ import { DatabaseService } from '../database/database.service';
 import { Router } from '@angular/router'
 
 import { EditMangaComponent } from '../modals/edit-manga/edit-manga.component';
+import { UploadMangaComponent } from '../modals/upload-manga/upload-manga.component';
 
 import {MatGridList} from '@angular/material/grid-list';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { UploadMangaComponent } from '../modals/upload-manga/upload-manga.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
+
 
 
 @Component({
@@ -22,7 +24,8 @@ export class LibraryComponent implements OnInit {
   constructor(
     private db: DatabaseService,
     private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private _snackBar: MatSnackBar
   ) {
     this.getList();
   }
@@ -82,6 +85,23 @@ export class LibraryComponent implements OnInit {
     dialogRef.afterClosed().subscribe( async () => {
       console.log('The Upload dialog was closed');
       await this.getList();
+    });
+  }
+
+  showInfo(title) {
+    console.log(title);
+  }
+
+  async deleteManga(title) {
+    let res = await this.db.delete(title);
+    this.openSnackBar(`${title} has been deleted`, `Thanks`);
+
+    await this.getList();
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 2000,
     });
   }
 
