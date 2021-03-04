@@ -1,8 +1,25 @@
 <h1>{{ this.manga.title }}</h1>
 <br>
-<img *ngFor='let page of this.manga.pages' src={{page}}>
+
+<img src={{this.manga.pages[page]}} class='page'>
+<br>
+<button mat-icon-button (click)="minus()">←</button>
+<span>
+  <input #pageTyper class='pageTyper'
+  type="number" id="pageTyper" value={{page}}
+  min="0" max={{this.manga.pages.length}}
+  (change)="pageTyperChange($event.target.value)"
+  >
+  / {{this.manga.pages.length-1}}
+</span>
+<button mat-icon-button (click)="plus()">→</button>
 
 <!--
-  Need a proper reading page that can scroll or click through pages etc etc.
+  Basic reading page works via clicks on the page change button or input into the pageTyper.
+  Need to sharpen looks with a  nice border or something and make buttons look prettier.
+
+  Need to make page fit by width instead of height for mobile and smaller windows.
+
+  Also remembering read progress.
 
 -->

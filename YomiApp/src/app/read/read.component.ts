@@ -14,6 +14,8 @@ export class ReadComponent implements OnInit {
   title: string;
   manga: any;
 
+  page: number = 0;
+
   constructor(
     private route: ActivatedRoute,
     private db: DatabaseService
@@ -36,6 +38,28 @@ export class ReadComponent implements OnInit {
     } else {
       console.log(`Error (Unknown)`)
     }
+  }
+
+  minus() {
+    if ( this.page != 0 ) {
+      this.page--
+    }
+  }
+
+  plus() {
+    if ( this.page < this.manga.pages.length-1 ) {
+      this.page++
+    }
+  }
+
+  pageTyperChange(val) {
+    if( val > this.manga.pages.length -1 ) {
+      val = this.manga.pages.length-1
+    } else if ( val < 0 ) {
+      val = 0
+    }
+
+    this.page = val;
   }
 
 }

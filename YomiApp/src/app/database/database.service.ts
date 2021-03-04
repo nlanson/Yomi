@@ -10,8 +10,8 @@ import { catchError, retry } from 'rxjs/operators';
 })
 export class DatabaseService {
 
-  //baseurl:string = 'https://mdb.nlanson.ga' //Personal Production URL
-  baseurl: string = 'http://localhost:6969' //Docker URL
+  baseurl:string = 'https://mdb.nlanson.ga' //Connects to the proxy for the database (My production setup)
+  //baseurl: string = 'http://localhost:6969' //Connects to local machine of the client (Testing on local machine)
 
   constructor(
     private http: HttpClient
