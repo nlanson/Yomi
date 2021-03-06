@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, UrlHandlingStrategy } from '@angular/router';
 
 import { DatabaseService } from '../database/database.service';
 
@@ -32,6 +32,7 @@ export class ReadComponent implements OnInit {
     if ( res.status == 200 ) {
       console.log(res.body);
       this.manga = res.body;
+      this.preloadImages();
     } else if ( res.status == 411 ) {
       console.log(`${this.title} was not found in the database.`);
       this.manga = undefined;
@@ -60,6 +61,13 @@ export class ReadComponent implements OnInit {
     }
 
     this.page = val;
+  }
+
+  preloadImages() {
+    for ( let i = 0; i < this.manga.pages.length; i++ ) {
+      var tempImg = new Image();
+      tempImg.src = this.manga.pages[i];
+    }
   }
 
 }

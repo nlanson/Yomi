@@ -3,7 +3,7 @@
 
 <img src={{this.manga.pages[page]}} class='page'>
 <br>
-<button mat-icon-button (click)="minus()">←</button>
+<button mat-icon-button (click)="plus()" (keyup.arrowright)="plus()">←</button>
 <span>
   <input #pageTyper class='pageTyper'
   type="number" id="pageTyper" value={{page}}
@@ -12,7 +12,7 @@
   >
   / {{this.manga.pages.length-1}}
 </span>
-<button mat-icon-button (click)="plus()">→</button>
+<button mat-icon-button (click)="minus()" (keyup.arrowleft)="minus()">→</button>
 
 <!--
   Basic reading page works via clicks on the page change button or input into the pageTyper.
