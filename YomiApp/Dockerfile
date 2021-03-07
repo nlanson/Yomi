@@ -17,3 +17,4 @@ VOLUME [ "/usr/share/nginx/html/data" ]
 WORKDIR /
 
 COPY --from=compile-image /opt/ng/dist/YomiApp /usr/share/nginx/html
+
