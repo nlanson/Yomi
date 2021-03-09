@@ -26,7 +26,7 @@ export class DatabaseService {
     await this.refreshdb();
     let url = this.baseurl + '/list';
     let list = await this.http.get(url, {observe: 'response'}).toPromise();
-
+    console.log(this.baseurl);
     return list;
   }
 
