@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
-import { environment } from '../../environments/environment'
 
 
 @Injectable({
@@ -12,21 +11,20 @@ import { environment } from '../../environments/environment'
 export class DatabaseService {
 
   //baseurl:string = 'https://mdb.nlanson.ga' //Connects to the proxy for the database (My production setup)
-  //baseurl: string = 'http://localhost:6969' //Connects to local machine of the client (Testing on local machine)
-  baseurl: string = environment.DATABASE_URI;
+  baseurl: string = 'http://localhost:6969' //Connects to local machine of the client (Testing on local machine)
+
   /*
     Need to find a way for users to set there own proxy url to their version of the hosted database.
   */
 
   constructor(
     private http: HttpClient
-  ) {  }
+  ) { console.log(this.baseurl) }
 
   async getList(): Promise<any> {
     await this.refreshdb();
     let url = this.baseurl + '/list';
     let list = await this.http.get(url, {observe: 'response'}).toPromise();
-    console.log(this.baseurl);
     return list;
   }
 

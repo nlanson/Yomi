@@ -4,7 +4,7 @@ import { MatSidenav } from '@angular/material/sidenav'
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 import { DatabaseService } from './database/database.service';
-import { LibraryComponent } from './library/library.component'
+import { LibraryComponent } from './library/library.component';
 
 @Component({
   selector: 'app-root',

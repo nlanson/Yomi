@@ -2,19 +2,15 @@ version: "3"
 
 services:
   webapp:
-    image: nlanson/yomiapp:envar
-    environment:
-      TZ: Australia/Sydney
-      DATABASE_URI: "http://localhost:6969"
+    image: nlanson/yomiapp:test
     volumes:
       - "./data:/usr/share/nginx/html/data" #Data is mounted to the directory where the Angular App is running.
     ports:
       - "8080:80"
     container_name: webapp
+    stdin_open: true
   server:
     image: nlanson/yomiserver:test
-    environment:
-      TZ: Australia/Sydney
     volumes:
       - "./data:/data"
     ports:
