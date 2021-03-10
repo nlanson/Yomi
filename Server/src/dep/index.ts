@@ -7,7 +7,7 @@ import path from 'path';
 const unzipper = require('unzipper');
 
 const app = express();
-const port = 6969;
+const port = 6969; //Default port for the Yomi Server.
 
 
 /*
@@ -21,6 +21,10 @@ DB Structure:
     }
 ]
 */
+interface CommonHandlerResult {
+    success: Boolean,
+    message: string
+}
 
 class Database {
     dbpath: string;
@@ -155,6 +159,50 @@ class Database {
 
 }//END DB Class
 
+interface CollectionInterface {
+    name: string;
+    mangas: Array<string>;
+    count: number;
+    add( manga: string ): void;
+    remove( manga: string ): CommonHandlerResult;
+    edit( newName: string ): void;
+}
+
+class Collection implements CollectionInterface {
+    name: string;
+    mangas: Array<string>;
+    count: number;
+    
+    constructor(name: string, mangas: Array<string>) {
+        this.name = name;
+        this.mangas = mangas;
+        this.count = this.mangas.length;
+    }
+
+    add(manga: string): void {
+        this.mangas.push(manga);
+    }
+
+    remove(manga: string): CommonHandlerResult {
+        let found = false;
+        for ( let i=0; i < this.mangas.length; i++ ) {
+            if ( this.mangas[i] == manga ) {
+                this.mangas.slice(i, 1);
+                found = true;
+            }
+        }
+
+        if ( found == true ) { 
+            return {success: true, message: 'Manga not found'}
+        } else {
+            return {success: false, message: 'Manga not found'}
+        }
+    }
+
+    edit(newName: string): void {
+        this.name = newName;
+    }
+}
 
 class Server {
     app: any;
@@ -336,11 +384,6 @@ class Server {
 
 }//END Server Class
 
-
-interface CommonHandlerResult {
-    success: Boolean,
-    message: string
-}
 
 class UploadHandler {
 
