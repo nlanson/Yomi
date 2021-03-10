@@ -11,6 +11,8 @@ services:
     stdin_open: true
   server:
     image: nlanson/yomiserver:test
+    environment: 
+      TZ: Australia/Sydney
     volumes:
       - "./data:/data"
     ports:

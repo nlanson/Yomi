@@ -1,7 +1,8 @@
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-const unzipper = require('unzipper');
+import { Logger } from './Logger';
+
 
 export class Database {
     dbpath: string;
@@ -24,7 +25,7 @@ export class Database {
     
     //Scans for any directories that could contain manga in the Database Path.
     scan_dir() {
-        console.log('Scanning...');
+        Logger.log(`DEBUG`, 'Scanning specifed path for manga...');
         
         return new Promise((resolve) => {
             var mangasList: any[] = [];
@@ -40,13 +41,13 @@ export class Database {
                                 path: fileDir
                             });
                         } else {
-                            console.log(`Deleting ${file} as it is not a directory.`)
+                            Logger.log(`DEBUG`, `Deleting ${file} as it is not a directory.`)
                             fs.unlink(fileDir, (err) => {
-                                if (err) console.log(err)
+                                if (err) Logger.log('ERROR', `${err}`)
                             })
                         }
                     });
-                    console.log('DONE');
+                    Logger.log(`DEBUG`, 'Scan complete');
                     resolve(mangasList);
                 }
             }); 
@@ -55,11 +56,11 @@ export class Database {
     
     //Initiales the DB from scanned dirs.
     async init_db() {
-        console.log('Creating DB')
+        Logger.log('DEBUG', 'Creating Database Object');
         for ( let i = 0; i < this.mangadb.length; i++ ) {
             this.mangadb[i].pageCount = await this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
             if ( this.mangadb[i].pageCount == 0 ) {
-                console.log(`Deleting ${this.mangadb[i].title} as it has a page count of zero.`)
+                Logger.log( 'DEBUG', `Deleting ${this.mangadb[i].title} as it has a page count of zero.`);
                 fs.rmdirSync(this.mangadb[i].path, { recursive: true });
                 this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
                 continue
@@ -68,7 +69,7 @@ export class Database {
             this.mangadb[i].pages = await this.makePagesArray(this.mangadb[i].path); //Create an array of pages and their directories.
             this.mangadb[i].cover = this.addPreview(this.mangadb[i].pages) //Creates a cover property with the first page of the manga as the value.
         }
-        console.log('DONE')
+        Logger.log('DEBUG', 'Database created.')
     }
     
     addPreview(pages: Array<any>) {

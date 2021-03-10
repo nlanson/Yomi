@@ -1,8 +1,8 @@
 import { Database } from './Database';
 import { Server } from './Server';
 
-class Main {
-    static async __init(dbpath: string): Promise<void> {
+class YomiInitialiser {
+    static async run(dbpath: string): Promise<void> {
         var db = new Database(dbpath);
         await db.setup();
     
@@ -16,7 +16,7 @@ async function main() {
     let prodPath = '/data/manga';
     let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
     
-    await Main.__init(prodPath);
+    await YomiInitialiser.run(prodPath);
 }
 
 main();

@@ -23,6 +23,7 @@ exports.UploadHandler = void 0;
 const fs_1 = __importDefault(require("fs"));
 const fsPromises = fs_1.default.promises;
 const path_1 = __importDefault(require("path"));
+const Logger_1 = require("./Logger");
 const unzipper = require('unzipper');
 class UploadHandler {
     constructor(file, db) {
@@ -41,7 +42,7 @@ class UploadHandler {
                     yield this.unarchive();
                 }
                 catch (error) {
-                    console.log(error.message);
+                    Logger_1.Logger.log('ERROR', `${error.message}`);
                     response.success = false;
                     response.message = error.message;
                     resolve(response);
@@ -55,7 +56,7 @@ class UploadHandler {
                     }
                 }
                 catch (e) {
-                    console.log(e.message);
+                    Logger_1.Logger.log('ERROR', `${e.message}`);
                     response.success = false;
                     response.message = e.message;
                     resolve(response);
@@ -69,7 +70,7 @@ class UploadHandler {
                     }
                 }
                 catch (e) {
-                    console.log(e.message);
+                    Logger_1.Logger.log('ERROR', `${e.message}`);
                     response.success = false;
                     response.message = e.message;
                     resolve(response);
@@ -78,7 +79,7 @@ class UploadHandler {
                     yield this.mv();
                 }
                 catch (e) {
-                    console.log(e.message);
+                    Logger_1.Logger.log('ERROR', `${e.message}`);
                     response.success = false;
                     response.message = 'No valid files were in the archive.';
                     resolve(response);
@@ -88,7 +89,7 @@ class UploadHandler {
                     this.deleteFile(this.file);
                 }
                 catch (e) {
-                    console.log(e.message);
+                    Logger_1.Logger.log('ERROR', `${e.message}`);
                     response.success = false;
                     response.message = 'No valid files were in the archive.';
                     resolve(response);
@@ -141,7 +142,7 @@ class UploadHandler {
                 try {
                     for (var files_1 = __asyncValues(files), files_1_1; files_1_1 = yield files_1.next(), !files_1_1.done;) {
                         let file = files_1_1.value;
-                        console.log(file);
+                        Logger_1.Logger.log(`INFO`, `File: ${file}`);
                         let fileDir = path_1.default.join(this.temp, file);
                         //If the file in this.dbpath is a directory, do the dupe detection.  
                         if (fs_1.default.statSync(fileDir).isDirectory()) {
@@ -161,7 +162,7 @@ class UploadHandler {
                                 else {
                                     //If the directory is a dupe, tag it with the dupe_UI and reloop.
                                     inval = true;
-                                    console.log(`${file} is an invalid name.`);
+                                    Logger_1.Logger.log(`DEBUG`, `${file} is an invalid name.`);
                                     file = file + `(${dupe_UI.toString()})`;
                                     dupe_UI++;
                                 }
@@ -212,11 +213,11 @@ class UploadHandler {
                         }
                     }
                     catch (e) {
-                        console.log(e.message);
+                        Logger_1.Logger.log('ERROR', `${e.message}`);
                         reject(new Error(e.message));
                     }
                     if (this.tempdb[i].pageCount == 0) {
-                        console.log(`${this.tempdb[i].path} has no valid pages.`);
+                        Logger_1.Logger.log(`DEBUG`, `${this.tempdb[i].path} has no valid pages.`);
                         if (fs_1.default.statSync(this.tempdb[i].path).isDirectory()) {
                             fs_1.default.rmdirSync(this.tempdb[i].path, { recursive: true });
                         }

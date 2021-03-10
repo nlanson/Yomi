@@ -1,10 +1,10 @@
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-const unzipper = require('unzipper');
-
 import { Database } from './Database'
 import { CommonHandlerResult } from './interfaces';
+import { Logger } from './Logger';
+const unzipper = require('unzipper');
 
 export class UploadHandler {
 
@@ -31,7 +31,7 @@ export class UploadHandler {
             try {
                 await this.unarchive();
             } catch (error) {
-                console.log(error.message);
+                Logger.log('ERROR', `${error.message}`);
                 response.success = false;
                 response.message = error.message;
                 resolve(response);
@@ -45,7 +45,7 @@ export class UploadHandler {
                     resolve(response);
                 }
             } catch (e) {
-                console.log(e.message);
+                Logger.log('ERROR', `${e.message}`);
                 response.success = false;
                 response.message = e.message;
                 resolve(response);
@@ -59,7 +59,7 @@ export class UploadHandler {
                     resolve(response);
                 }
             } catch (e) {
-                console.log(e.message);
+                Logger.log('ERROR', `${e.message}`);
                 response.success = false;
                 response.message = e.message;
                 resolve(response);
@@ -68,7 +68,7 @@ export class UploadHandler {
             try {
                 await this.mv();
             } catch (e) {
-                console.log(e.message);
+                Logger.log('ERROR', `${e.message}`);
                 response.success = false;
                 response.message = 'No valid files were in the archive.'
                 resolve(response);
@@ -78,7 +78,7 @@ export class UploadHandler {
                 this.deleteDir(this.temp);
                 this.deleteFile(this.file);
             } catch (e) {
-                console.log(e.message);
+                Logger.log('ERROR', `${e.message}`);
                 response.success = false;
                 response.message = 'No valid files were in the archive.'
                 resolve(response);
@@ -128,7 +128,7 @@ export class UploadHandler {
         return new Promise(async (resolve, reject) => {
             let files = await fsPromises.readdir(this.temp);
             for await (let file of files) {
-                console.log(file);
+                Logger.log(`INFO`, `File: ${file}`);
                 let fileDir = path.join(this.temp, file);
                 //If the file in this.dbpath is a directory, do the dupe detection.  
                 if ( fs.statSync(fileDir).isDirectory() ) {       
@@ -147,7 +147,7 @@ export class UploadHandler {
                         } else {
                             //If the directory is a dupe, tag it with the dupe_UI and reloop.
                             inval = true;
-                            console.log(`${file} is an invalid name.`);
+                            Logger.log(`DEBUG`, `${file} is an invalid name.`)
                             file = file + `(${dupe_UI.toString()})`;
                             dupe_UI++
                         }
@@ -187,12 +187,12 @@ export class UploadHandler {
                         this.tempdb[i].pageCount = await this.getPageCount(this.tempdb[i].path); 
                     }
                 } catch (e) {
-                    console.log(e.message);
+                    Logger.log('ERROR', `${e.message}`);
                     reject(new Error(e.message));
                 }
 
                 if ( this.tempdb[i].pageCount == 0 ) { 
-                    console.log(`${this.tempdb[i].path} has no valid pages.`)
+                    Logger.log(`DEBUG`, `${this.tempdb[i].path} has no valid pages.`)
                     if ( fs.statSync(this.tempdb[i].path).isDirectory() ) {
                         fs.rmdirSync(this.tempdb[i].path, { recursive: true });
                     }

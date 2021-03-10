@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const Database_1 = require("./Database");
 const Server_1 = require("./Server");
-class Main {
-    static __init(dbpath) {
+class YomiInitialiser {
+    static run(dbpath) {
         return __awaiter(this, void 0, void 0, function* () {
             var db = new Database_1.Database(dbpath);
             yield db.setup();
@@ -24,7 +24,7 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let prodPath = '/data/manga';
         let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
-        yield Main.__init(prodPath);
+        yield YomiInitialiser.run(prodPath);
     });
 }
 main();
