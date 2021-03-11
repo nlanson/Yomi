@@ -2,8 +2,6 @@ FROM node:12 AS compile-image
 
 WORKDIR /opt/ng
 
-# Mount /data volume here and let it accessible to the angular builder.
-
 COPY package.json ./
 
 RUN npm install
