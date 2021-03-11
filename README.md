@@ -2,7 +2,8 @@
 Self-Hosted Manga Server and Accompanying Web App.
 
 ## Development Status
-The Database, API and Web App are all currently under early stages of development.
+The project is at an early stage of development but there are some test images available for anyone wanting to run the docker image.\
+See https://hub.docker.com/r/nlanson/yomiserver and https://hub.docker.com/r/nlanson/yomiapp.
 
 API is Rest with ExpressJS.\
 DB is Non-SQL JSON Based.\

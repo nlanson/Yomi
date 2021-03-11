@@ -1,3 +1,6 @@
+# # # # # # # # #
+# BUILD THE APP #
+# # # # # # # # #
 FROM node:12 AS compile-image
 
 WORKDIR /opt/ng
@@ -8,6 +11,10 @@ RUN npm install
 
 COPY . ./
 
+
+# # # # # # #  #
+# HOST THE APP #
+#  # # # # # # #
 RUN node_modules/.bin/ng build --prod
 
 FROM nginx
