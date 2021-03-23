@@ -1,4 +1,5 @@
-import { CollectionInterface, CommonHandlerResult } from './interfaces';
+//Internal
+import { CollectionInterface, CommonHandlerResult } from './Common/Interfaces';
 
 export class Collection implements CollectionInterface {
     name: string;

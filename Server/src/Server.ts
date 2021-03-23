@@ -1,13 +1,17 @@
+//External
 import express, { Request, Response } from 'express';
+const app = express();
 import fs from 'fs';
-import { Database } from './Database';
-import { UploadHandler } from './UploadHandler'
-import { Logger } from './Logger';
-
+const fsPromises = fs.promises;
 const upload = require('express-fileupload');
 const cors = require('cors');
-const fsPromises = fs.promises;
-const app = express();
+
+//Internal
+import { Database } from './Database';
+import { UploadHandler } from './UploadHandler'
+import { Logger } from './Common/Logger';
+
+//Config
 const port = 6969; //Default port for the Yomi Server.
 
 

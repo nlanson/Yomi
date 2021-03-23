@@ -1,7 +1,10 @@
+//External
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-import { Logger } from './Logger';
+
+//Internal
+import { Logger } from './Common/Logger';
 
 
 export class Database {

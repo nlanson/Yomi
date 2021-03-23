@@ -1,3 +1,4 @@
+//Internal
 import { Database } from './Database';
 import { Server } from './Server';
 

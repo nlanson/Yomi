@@ -20,11 +20,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadHandler = void 0;
+//External
 const fs_1 = __importDefault(require("fs"));
 const fsPromises = fs_1.default.promises;
 const path_1 = __importDefault(require("path"));
-const Logger_1 = require("./Logger");
 const unzipper = require('unzipper');
+const Logger_1 = require("./Common/Logger");
 class UploadHandler {
     constructor(file, db) {
         this.tempdb = [];

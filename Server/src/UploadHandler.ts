@@ -1,10 +1,14 @@
+//External
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-import { Database } from './Database'
-import { CommonHandlerResult } from './interfaces';
-import { Logger } from './Logger';
 const unzipper = require('unzipper');
+
+//Internal
+import { Database } from './Database'
+import { CommonHandlerResult } from './Common/Interfaces';
+import { Logger } from './Common/Logger';
+
 
 export class UploadHandler {
 

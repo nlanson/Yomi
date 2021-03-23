@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+//Internal
 const Database_1 = require("./Database");
 const Server_1 = require("./Server");
 class YomiInitialiser {

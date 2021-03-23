@@ -24,14 +24,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
+//External
 const express_1 = __importDefault(require("express"));
+const app = express_1.default();
 const fs_1 = __importDefault(require("fs"));
-const UploadHandler_1 = require("./UploadHandler");
-const Logger_1 = require("./Logger");
+const fsPromises = fs_1.default.promises;
 const upload = require('express-fileupload');
 const cors = require('cors');
-const fsPromises = fs_1.default.promises;
-const app = express_1.default();
+const UploadHandler_1 = require("./UploadHandler");
+const Logger_1 = require("./Common/Logger");
+//Config
 const port = 6969; //Default port for the Yomi Server.
 class Server {
     constructor(db) {
