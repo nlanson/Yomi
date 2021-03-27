@@ -5,9 +5,16 @@ export interface CommonHandlerResult {
 
 export interface CollectionInterface {
     name: string;
-    mangas: Array<string>;
+    mangas: Array<CollectionMangaData>;
     count: number;
-    add( manga: string ): void;
-    remove( manga: string ): CommonHandlerResult;
-    edit( newName: string ): void;
+    addEntry( manga: CollectionMangaData ): void;
+    removeEntry( manga: string ): CommonHandlerResult;
+    editCollectionName( newName: string ): void;
+}
+
+export interface CollectionMangaData {
+    title: string;
+    path: string;
+    pages: string;
+    cover: string;
 }

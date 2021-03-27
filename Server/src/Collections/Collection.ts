@@ -1,25 +1,25 @@
 //Internal
-import { CollectionInterface, CommonHandlerResult } from './Common/Interfaces';
+import { CollectionInterface, CollectionMangaData, CommonHandlerResult } from '../Common/Interfaces';
 
 export class Collection implements CollectionInterface {
     name: string;
-    mangas: Array<string>;
+    mangas: Array<CollectionMangaData>;
     count: number;
     
-    constructor(name: string, mangas: Array<string>) {
+    constructor(name: string, mangas: Array<CollectionMangaData>) {
         this.name = name;
         this.mangas = mangas;
         this.count = this.mangas.length;
     }
 
-    add(manga: string): void {
+    addEntry(manga: CollectionMangaData): void {
         this.mangas.push(manga);
     }
 
-    remove(manga: string): CommonHandlerResult {
+    removeEntry(manga: string): CommonHandlerResult {
         let found = false;
         for ( let i=0; i < this.mangas.length; i++ ) {
-            if ( this.mangas[i] == manga ) {
+            if ( this.mangas[i].title == manga ) {
                 this.mangas.slice(i, 1);
                 found = true;
             }
@@ -32,7 +32,7 @@ export class Collection implements CollectionInterface {
         }
     }
 
-    edit(newName: string): void {
+    editCollectionName(newName: string): void {
         this.name = newName;
     }
 }

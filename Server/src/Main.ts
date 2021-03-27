@@ -6,8 +6,10 @@ class YomiInitialiser {
     static async run(dbpath: string): Promise<void> {
         var db = new Database(dbpath);
         await db.setup();
+
+        //Implement collection engine setup here.
     
-        let server = new Server(db);
+        let server = new Server(db); //Make collection data accessible through API, pass param here.
     }
 }
 

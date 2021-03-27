@@ -200,4 +200,7 @@ export class Server {
         });
     }
 
+
+    //Add collection querying API endpoints here that reference the param passed in.
+
 }//END Server Class
