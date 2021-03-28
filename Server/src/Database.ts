@@ -139,3 +139,13 @@ export class Database {
     }
 
 }//END DB Class
+
+/*
+
+Currently, the DB only performs initialisation and the API does edits, deletes and new uploads.
+
+Maybe the edit, delete and upload handling should be done in the Database class here and the method is just called by the API??
+Then the database wouldnt have to re-initiase each time a method is called.
+
+
+*/
