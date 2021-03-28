@@ -10,6 +10,8 @@ const cors = require('cors');
 import { Database } from './Database';
 import { UploadHandler } from './UploadHandler'
 import { Logger } from './Common/Logger';
+import { CollectionEngine } from './Collections/CollectionEngine';
+import { CollectionMangaData } from './Common/Interfaces';
 
 //Config
 const port = 6969; //Default port for the Yomi Server.
@@ -18,19 +20,25 @@ const port = 6969; //Default port for the Yomi Server.
 export class Server {
     app: any;
     db: Database;
+    cdb: CollectionEngine;
 
-    constructor( db: Database ) {
+    constructor( db: Database, cdb: CollectionEngine ) {
         this.app = app;
         this.db = db;
+        this.cdb = cdb;
 
         this.init_server();
         
     }
-
+    
     init_server() {
+        //Express Middleware
         this.app.use(upload());
         this.app.use(cors());
         
+        //Could possibly seperate MangaDBAPI and ColDBAPI into seperate classes for organisation.
+        
+        //MangaDB API
         this.refreshdb();
         this.searchByTitle();
         this.listdb();
@@ -38,6 +46,11 @@ export class Server {
         this.upload();
         this.deleteManga();
 
+        //CollectionDB API
+        this.newCollection();
+        this.listCollections();
+
+        //Start listening on port
         this.listen();
     }
     
@@ -47,6 +60,10 @@ export class Server {
         });
     }
 
+    /*
+        Start MangaDB API Endpoints
+    */
+    
     searchByTitle() { //Search the manga by title using api request /manga/{title}
                       //Returns the Manga info such as title, path and page count as well as array of page paths.
         this.app.get('/manga/:title', (req: any, res: any) => {
@@ -200,7 +217,32 @@ export class Server {
         });
     }
 
+    /*
+        Start CollectionEngine API Endpoints
+    */
 
-    //Add collection querying API endpoints here that reference the param passed in.
+    newCollection() {
+        this.app.get('/newcol/:colinfo', (req: any, res: any) => {
+            Logger.log(`DEBUG`, 'New Collection Requested')
+            let newCollectionInfo = req.params.colinfo;
+            newCollectionInfo = JSON.parse(newCollectionInfo);
+            let collectionName: string = newCollectionInfo.name;
+            let collectionContents: Array<CollectionMangaData> = newCollectionInfo.mangas;
+
+            let result = this.cdb.newCollection(collectionName, collectionContents);
+            if ( result ) res.status(200).send({success: true, message: `New collection created.`});
+            else res.status(500).send({success: false, message: `Collection creation failed.`});
+        });
+    }
+
+    listCollections() {
+        this.app.get('/listcollections/', (req: any, res: any) => {
+            Logger.log(`DEBUG`, 'List Collections Requested');
+
+            let list = this.cdb.collectionList;
+
+            res.status(200).send(list);
+        });
+    }
 
 }//END Server Class

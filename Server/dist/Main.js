@@ -10,14 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 //Internal
+const CollectionEngine_1 = require("./Collections/CollectionEngine");
 const Database_1 = require("./Database");
 const Server_1 = require("./Server");
 class YomiInitialiser {
     static run(dbpath) {
         return __awaiter(this, void 0, void 0, function* () {
-            var db = new Database_1.Database(dbpath);
-            yield db.setup();
-            let server = new Server_1.Server(db);
+            var mdb = new Database_1.Database(dbpath);
+            yield mdb.setup();
+            var cdb = new CollectionEngine_1.CollectionEngine('/data/collections.json', mdb);
+            yield cdb.setup();
+            let server = new Server_1.Server(mdb, cdb); //Make collection data accessible through API, pass param here.
         });
     }
 }

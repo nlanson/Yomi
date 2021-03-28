@@ -36,20 +36,28 @@ const Logger_1 = require("./Common/Logger");
 //Config
 const port = 6969; //Default port for the Yomi Server.
 class Server {
-    constructor(db) {
+    constructor(db, cdb) {
         this.app = app;
         this.db = db;
+        this.cdb = cdb;
         this.init_server();
     }
     init_server() {
+        //Express Middleware
         this.app.use(upload());
         this.app.use(cors());
+        //Could possibly seperate MangaDBAPI and ColDBAPI into seperate classes for organisation.
+        //MangaDB API
         this.refreshdb();
         this.searchByTitle();
         this.listdb();
         this.editManga();
         this.upload();
         this.deleteManga();
+        //CollectionDB API
+        this.newCollection();
+        this.listCollections();
+        //Start listening on port
         this.listen();
     }
     listen() {
@@ -57,6 +65,9 @@ class Server {
             Logger_1.Logger.log(`INFO`, `Yomi Server listening at http://localhost:${port}`);
         });
     }
+    /*
+        Start MangaDB API Endpoints
+    */
     searchByTitle() {
         //Returns the Manga info such as title, path and page count as well as array of page paths.
         this.app.get('/manga/:title', (req, res) => {
@@ -198,6 +209,30 @@ class Server {
                 yield fsPromises.rmdir(this.db.dbpath + '/' + del, { recursive: true });
                 res.status(200).send({ success: true, message: `${del} was deleted.` });
             }));
+        });
+    }
+    /*
+        Start CollectionEngine API Endpoints
+    */
+    newCollection() {
+        this.app.get('/newcol/:colinfo', (req, res) => {
+            Logger_1.Logger.log(`DEBUG`, 'New Collection Requested');
+            let newCollectionInfo = req.params.colinfo;
+            newCollectionInfo = JSON.parse(newCollectionInfo);
+            let collectionName = newCollectionInfo.name;
+            let collectionContents = newCollectionInfo.mangas;
+            let result = this.cdb.newCollection(collectionName, collectionContents);
+            if (result)
+                res.status(200).send({ success: true, message: `New collection created.` });
+            else
+                res.status(500).send({ success: false, message: `Collection creation failed.` });
+        });
+    }
+    listCollections() {
+        this.app.get('/listcollections/', (req, res) => {
+            Logger_1.Logger.log(`DEBUG`, 'List Collections Requested');
+            let list = this.cdb.collectionList;
+            res.status(200).send(list);
         });
     }
 } //END Server Class

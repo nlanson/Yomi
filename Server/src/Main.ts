@@ -1,15 +1,17 @@
 //Internal
+import { CollectionEngine } from './Collections/CollectionEngine';
 import { Database } from './Database';
 import { Server } from './Server';
 
 class YomiInitialiser {
     static async run(dbpath: string): Promise<void> {
-        var db = new Database(dbpath);
-        await db.setup();
+        var mdb = new Database(dbpath);
+        await mdb.setup();
 
-        //Implement collection engine setup here.
+        var cdb = new CollectionEngine('/data/collections.json', mdb);
+        await cdb.setup();
     
-        let server = new Server(db); //Make collection data accessible through API, pass param here.
+        let server = new Server(mdb, cdb); //Make collection data accessible through API, pass param here.
     }
 }
 
