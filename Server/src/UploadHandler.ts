@@ -12,11 +12,11 @@ import { Logger } from './Common/Logger';
 
 export class UploadHandler {
 
-    file: string;
-    filetype: string;
-    db: Database;
-    temp: string;
-    tempdb: Array<any> = [];
+    private file: string;
+    private filetype: string;
+    private db: Database;
+    private temp: string;
+    private tempdb: Array<any> = [];
 
     constructor(
         file: string,
@@ -29,7 +29,7 @@ export class UploadHandler {
     }
 
     //Method to call.
-    async handle(): Promise<CommonHandlerResult> {
+    public async handle(): Promise<CommonHandlerResult> {
         let response: CommonHandlerResult = {success: false, message: 'unhandled.'}
         return new Promise(async (resolve, reject) => {
             try {
@@ -95,12 +95,12 @@ export class UploadHandler {
         });
     }
 
-    getFileType() {
+    private getFileType() {
         let filetype = path.extname(this.file);
         return filetype;
     }
 
-    async unarchive(): Promise<CommonHandlerResult> {
+    private async unarchive(): Promise<CommonHandlerResult> {
         return new Promise( async (resolve, reject) => {
             let result: CommonHandlerResult = { success: false, message: 'unarchiver failure'}
             switch ( this.filetype ) {
@@ -114,7 +114,7 @@ export class UploadHandler {
         });
     }
 
-    async unzip(): Promise<CommonHandlerResult> {
+    private async unzip(): Promise<CommonHandlerResult> {
         return new Promise( async (resolve, reject) => {
             const zip = await fs.createReadStream(this.file) //Extract ZIP to /temp/ folder.
                 .pipe(unzipper.Extract({ path: this.temp }))
@@ -128,7 +128,7 @@ export class UploadHandler {
         });
     }
     
-    async scan_temp(): Promise<CommonHandlerResult> {
+    private async scan_temp(): Promise<CommonHandlerResult> {
         return new Promise(async (resolve, reject) => {
             let files = await fsPromises.readdir(this.temp);
             for await (let file of files) {
@@ -167,7 +167,7 @@ export class UploadHandler {
         });
     }
 
-    async checkForInvalidFileName(title: string): Promise<Boolean> {
+    private async checkForInvalidFileName(title: string): Promise<Boolean> {
         return new Promise((resolve, reject) => {
             let i=0;
             let found: Boolean = false;
@@ -183,7 +183,7 @@ export class UploadHandler {
         })
     }
 
-    async pageValidator(): Promise<CommonHandlerResult> {
+    private async pageValidator(): Promise<CommonHandlerResult> {
         return new Promise( async (resolve, reject) => {
             for ( let i=0; i < this.tempdb.length; i++ ) {
                 try {
@@ -209,7 +209,7 @@ export class UploadHandler {
         })
     }
 
-    getPageCount(manga_path: string): Promise<number> { //Counts how many pages in a temp manga dir.
+    private getPageCount(manga_path: string): Promise<number> { //Counts how many pages in a temp manga dir.
         return new Promise((resolve, reject) => {
             var pages: number = 0;
             fs.readdir(manga_path, (err, files) => {
@@ -232,7 +232,7 @@ export class UploadHandler {
         });
     }
 
-    async mv(): Promise<CommonHandlerResult> {
+    private async mv(): Promise<CommonHandlerResult> {
         return new Promise((resolve, reject) => {
             for ( let i=0; i < this.tempdb.length; i++ ) {
                 fs.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title, (err) => {
@@ -245,13 +245,13 @@ export class UploadHandler {
         });   
     }
 
-    deleteDir(dir: string) {
+    private deleteDir(dir: string) {
         fs.rmdir(dir, (err) => {
             if (err) throw new Error(`Directory ${dir} could not be deleted: ${err}`);
         });
     }
 
-    deleteFile(file: string) {
+    private deleteFile(file: string) {
         fs.unlink(file, (err) => {
             if (err) throw new Error(`File ${file} could not be deleted: ${err}`);
         })

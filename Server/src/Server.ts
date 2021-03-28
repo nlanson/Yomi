@@ -18,9 +18,9 @@ const port = 6969; //Default port for the Yomi Server.
 
 
 export class Server {
-    app: any;
-    db: Database;
-    cdb: CollectionEngine;
+    private app: any;
+    private db: Database;
+    private cdb: CollectionEngine;
 
     constructor( db: Database, cdb: CollectionEngine ) {
         this.app = app;
@@ -31,7 +31,7 @@ export class Server {
         
     }
     
-    init_server() {
+    private init_server() {
         //Express Middleware
         this.app.use(upload());
         this.app.use(cors());
@@ -54,7 +54,7 @@ export class Server {
         this.listen();
     }
     
-    listen() { //Starts API
+    private listen() { //Starts API
         this.app.listen(port, () => {
             Logger.log(`INFO`, `Yomi Server listening at http://localhost:${port}`);
         });
@@ -64,7 +64,7 @@ export class Server {
         Start MangaDB API Endpoints
     */
     
-    searchByTitle() { //Search the manga by title using api request /manga/{title}
+    private searchByTitle() { //Search the manga by title using api request /manga/{title}
                       //Returns the Manga info such as title, path and page count as well as array of page paths.
         this.app.get('/manga/:title', (req: any, res: any) => {
             let search = req.params.title;
@@ -87,7 +87,7 @@ export class Server {
         });
     }
 
-    listdb() { //List the DB to api request /list.
+    private listdb() { //List the DB to api request /list.
                // Can be used to list all manga in the DB to click and open.
         this.app.get('/list', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'List requested')
@@ -101,7 +101,7 @@ export class Server {
         });
     }
 
-    refreshdb() { //Refreshes the DB
+    private refreshdb() { //Refreshes the DB
         this.app.get('/refresh', async (req: any, res: any) => {
             Logger.log('DEBUG', 'Refresh requested')
             let status = await this.db.refresh();
@@ -112,7 +112,7 @@ export class Server {
         })
     }
 
-    editManga() {
+    private editManga() {
         this.app.get('/editmanga/:edit', async (req: any, res: any) => {
             Logger.log(`DEBUG`, 'Edit requested')
             let edit = req.params.edit;
@@ -160,7 +160,7 @@ export class Server {
         });
     }
 
-    upload() {
+    private upload() {
         this.app.get('/upload', (req: any, res: any) => {
             res.status(405)({status: 'failed', message: `You've requested this the wrong way.`})
         })
@@ -204,7 +204,7 @@ export class Server {
         });
     }
 
-    async deleteManga() {
+    private async deleteManga() {
         this.app.get('/deletemanga/:delete', async (req: Request, res: Response) => {
             Logger.log('DEBUG', 'Delete requested');
             let del: any = req.params.delete;
@@ -221,7 +221,7 @@ export class Server {
         Start CollectionEngine API Endpoints
     */
 
-    newCollection() {
+    private newCollection() {
         this.app.get('/newcol/:colinfo', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'New Collection Requested')
             let newCollectionInfo = req.params.colinfo;
@@ -235,7 +235,7 @@ export class Server {
         });
     }
 
-    listCollections() {
+    private listCollections() {
         this.app.get('/listcollections/', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'List Collections Requested');
 

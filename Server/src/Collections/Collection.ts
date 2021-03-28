@@ -2,9 +2,9 @@
 import { CollectionInterface, CollectionMangaData, CommonHandlerResult } from '../Common/Interfaces';
 
 export class Collection implements CollectionInterface {
-    name: string;
-    mangas: Array<CollectionMangaData>;
-    count: number;
+    public name: string;
+    public mangas: Array<CollectionMangaData>;
+    public count: number;
     
     constructor(name: string, mangas: Array<CollectionMangaData>) {
         this.name = name;

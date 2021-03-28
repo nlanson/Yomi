@@ -8,26 +8,26 @@ import { Logger } from './Common/Logger';
 
 
 export class Database {
-    dbpath: string;
-    mangadb: any;
+    public dbpath: string;
+    public mangadb: any;
     
     constructor(dbpath: string) {
         this.dbpath = dbpath;
     }
 
-    async setup() { //Initial DB Setup
+    public async setup() { //Initial DB Setup
         this.mangadb = await this.scan_dir();
         await this.init_db();
     }
 
-    async refresh() { //For refreshing the DB from API
+    public async refresh() { //For refreshing the DB from API
         this.mangadb = await this.scan_dir();
         await this.init_db();
         return true;
     }
     
     //Scans for any directories that could contain manga in the Database Path.
-    scan_dir() {
+    public scan_dir() {
         Logger.log(`DEBUG`, 'Scanning specifed path for manga...');
         
         return new Promise((resolve) => {
@@ -58,7 +58,7 @@ export class Database {
     }
     
     //Initiales the DB from scanned dirs.
-    async init_db() {
+    private async init_db() {
         Logger.log('DEBUG', 'Creating Database Object');
         for ( let i = 0; i < this.mangadb.length; i++ ) {
             this.mangadb[i].pageCount = await this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
@@ -75,12 +75,12 @@ export class Database {
         Logger.log('DEBUG', 'Database created.')
     }
     
-    addPreview(pages: Array<any>) {
+    private addPreview(pages: Array<any>) {
         return pages[0];
     }
 
 
-    getPageCount(abs_path: string): Promise<number> { //Counts how many pages in a manga dir.
+    private getPageCount(abs_path: string): Promise<number> { //Counts how many pages in a manga dir.
         return new Promise((resolve) => {
             var pages: String[] = [];
             fs.readdir(abs_path, (err, files) => {
@@ -103,7 +103,7 @@ export class Database {
         });
     }
 
-    makePagesArray(abs_path: string): Promise<any> { //Creates an array of manga pages from paths.
+    private makePagesArray(abs_path: string): Promise<any> { //Creates an array of manga pages from paths.
         return new Promise((resolve) => {
             var pages: String[] = [];
             fs.readdir(abs_path, (err, files) => {

@@ -19,6 +19,7 @@ class CollectionEngine {
     newCollection(name, mangas) {
         let newCol = new Collection_1.Collection(name, mangas);
         //validate collection entries here.
+        //also perform duplicate name check OR implement collection ID system.
         //once validated, push.
         this.coldb.push(newCol);
         return true;
