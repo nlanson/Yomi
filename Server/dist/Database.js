@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -143,5 +154,127 @@ class Database {
             });
         });
     }
+    /*
+    API FUNCTIONS
+    */
+    searchByTitle(title) {
+        console.log('query received');
+        let found = false;
+        let i = 0;
+        while (i < this.mangadb.length && found == false) {
+            if (this.mangadb[i].title == title) {
+                found = true;
+                return {
+                    success: true,
+                    message: "Found",
+                    content: this.mangadb[i]
+                };
+            }
+            i++;
+        }
+        if (found == false) {
+            return {
+                success: false,
+                message: "Manga not found.",
+                content: null
+            };
+        }
+        else { //fallback
+            return {
+                success: false,
+                message: "Error",
+                content: null
+            };
+        }
+    }
+    list() {
+        let list = [];
+        for (let manga in this.mangadb) {
+            const listEntry = ((_a) => {
+                var { pages } = _a, manga = __rest(_a, ["pages"]);
+                return manga;
+            })(this.mangadb[manga]); // Remove pages property from mangadb entries and push into list.
+            list.push(listEntry);
+        }
+        return { success: true, message: 'list compiled', content: list };
+    }
+    editMangaName(o, n) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let i = 0; //Loop iterator
+            let found = false; //Was the manga found?
+            let message; //return message for the API
+            let flag = true; //Flag for checking if FS failed or not.
+            while (i < this.mangadb.length && found == false) { //Loop through every manga
+                if (this.mangadb[i].title == o) { //If ogname equals any manga in the db then..,
+                    found = true;
+                    this.mangadb[i].title = n; //Set manga title to the new name
+                    //rename directory in db
+                    try {
+                        yield fsPromises.rename(this.mangadb[i].path, this.dbpath + '/' + n);
+                    }
+                    catch (e) {
+                        flag = false;
+                        Logger_1.Logger.log(`ERROR`, 'Edit Failed');
+                        message = "Rename failed. Manga exists but FS failed.";
+                        return { success: false, message: message, content: null }; //Rename failed. Manga exists but FS failed.
+                    }
+                    //If rename is successful, code will enter this condition.
+                    if (flag) {
+                        Logger_1.Logger.log(`DEBUG`, `Successfully Edited ${o} -> ${n}`);
+                        message = 'Edit Success';
+                        this.refresh(); //Refresh DB
+                        return { success: true, message: message, content: null }; // Full success
+                    }
+                }
+                i++;
+            }
+            //Fallback statement for when manga is not found in the database.
+            Logger_1.Logger.log(`ERROR`, 'Edit request manga not found.');
+            message = 'Manga not found';
+            let response = {
+                success: false,
+                message: 'Manga not found',
+                content: null
+            };
+            return response;
+        });
+    }
+    deleteManga(title) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let found = false;
+            let i = 0;
+            while (i < this.mangadb.length && found == false) {
+                if (this.mangadb[i].title = title) {
+                    found = false;
+                    //Delete directory containing manga
+                    yield fsPromises.rmdir(this.dbpath + '/' + title, { recursive: true });
+                    //Remove entry from DB
+                    this.mangadb.splice(i, 1);
+                    Logger_1.Logger.log('DEBUG', `${title} was deleted`);
+                    let response = {
+                        success: true,
+                        message: `Successfully Deleted`,
+                        content: null
+                    };
+                    return response;
+                }
+            }
+            Logger_1.Logger.log('ERROR', 'Manga to delete not found');
+            let response = {
+                success: false,
+                message: `Manga not found`,
+                content: null
+            };
+            return response;
+        });
+    }
 } //END DB Class
 exports.Database = Database;
+/*
+
+Currently, the DB only performs initialisation and the API does edits, deletes and new uploads.
+
+Need to pass upload func from Server class to Database class here.
+
+
+*/ 

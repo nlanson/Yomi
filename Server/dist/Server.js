@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -69,20 +58,16 @@ class Server {
         Start MangaDB API Endpoints
     */
     searchByTitle() {
-        //Returns the Manga info such as title, path and page count as well as array of page paths.
+        //Returns the Manga info
+        //Req Params is a single string.
         this.app.get('/manga/:title', (req, res) => {
             let search = req.params.title;
             Logger_1.Logger.log('DEBUG', `Searched requested for ${search}`);
-            let found = false;
-            let i = 0;
-            while (i < this.db.mangadb.length && found == false) {
-                if (this.db.mangadb[i].title == req.params.title) {
-                    found = true;
-                    res.status(200).send(this.db.mangadb[i]);
-                }
-                i++;
+            let qdb = this.db.searchByTitle(search);
+            if (qdb.success) {
+                res.status(200).send(qdb.content);
             }
-            if (found == false) {
+            else {
                 res.status(404).send({ success: false, message: 'Manga not found' });
                 Logger_1.Logger.log("ERROR", "Manga not found in search");
             }
@@ -92,72 +77,36 @@ class Server {
         // Can be used to list all manga in the DB to click and open.
         this.app.get('/list', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'List requested');
-            let list = [];
-            for (let manga in this.db.mangadb) {
-                const listEntry = ((_a) => {
-                    var { pages } = _a, manga = __rest(_a, ["pages"]);
-                    return manga;
-                })(this.db.mangadb[manga]); // Remove pages property from mangadb entries and push into list.
-                list.push(listEntry);
-            }
-            res.status(200).send(list);
+            let list = this.db.list();
+            res.status(200).send(list.content);
         });
     }
     refreshdb() {
         this.app.get('/refresh', (req, res) => __awaiter(this, void 0, void 0, function* () {
             Logger_1.Logger.log('DEBUG', 'Refresh requested');
-            let status = yield this.db.refresh();
+            let status = yield this.db.refresh(); //re inits the db.
             if (status == true) {
                 res.status(200).send({ success: true, message: 'Refresed.' });
             }
         }));
     }
     editManga() {
-        this.app.get('/editmanga/:edit', (req, res) => __awaiter(this, void 0, void 0, function* () {
-            Logger_1.Logger.log(`DEBUG`, 'Edit requested');
-            let edit = req.params.edit;
-            edit = JSON.parse(edit);
-            let ogName = edit.title;
-            let newName = edit.edit;
-            let i = 0;
-            let found = false;
-            let message;
-            while (i < this.db.mangadb.length && found == false) { //Loop through every manga
-                if (this.db.mangadb[i].title == ogName) { //If ogname equals any manga in the db then..,
-                    found = true;
-                    this.db.mangadb[i].title = newName; //Set manga title to the new name
-                    fs_1.default.rename(this.db.mangadb[i].path, this.db.dbpath + '/' + newName, (err) => {
-                        if (err) {
-                            message = err;
-                            Logger_1.Logger.log('ERROR', `${err.message}`);
-                        }
-                        else
-                            Logger_1.Logger.log(`DEBUG`, `Successfully Edited ${ogName} -> ${newName}`);
-                        this.db.refresh(); //Refresh DB
-                        if (!message) {
-                            message = 'Success';
-                            res.status(200).send({ success: true, message: message }); // Full success
-                        }
-                        else {
-                            res.status(500).send({ success: false, message: message }); //Partial success. Manga was valid but rename failed.
-                            Logger_1.Logger.log(`ERROR`, 'Edit partially successful. Manga was found but rename failed.');
-                        }
-                    });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.app.get('/editmanga/:edit', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                Logger_1.Logger.log(`DEBUG`, 'Edit requested');
+                let edit = req.params.edit;
+                let objectified = JSON.parse(edit);
+                let ogName = objectified.title;
+                let newName = objectified.edit;
+                let qdb = yield this.db.editMangaName(ogName, newName);
+                if (qdb.success) {
+                    res.status(200).send({ success: qdb.success, message: qdb.message }); // Full success
                 }
-                i++;
-            }
-            //If no match was found, then response with 'manga not found'
-            if (found == false) {
-                Logger_1.Logger.log(`ERROR`, 'Edit request manga not found.');
-                message = 'Manga not found';
-                let response = {
-                    success: found,
-                    message: message
-                };
-                res.status(404).send(response); //Respond with found = false and manga not found.
-                Logger_1.Logger.log(`ERROR`, 'Manga to edit not found.');
-            }
-        }));
+                else {
+                    res.status(500).send({ success: qdb.success, message: qdb.message }); //Partial success. Manga was valid but rename failed.
+                }
+            }));
+        });
     }
     upload() {
         this.app.get('/upload', (req, res) => {
@@ -204,10 +153,15 @@ class Server {
             this.app.get('/deletemanga/:delete', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 Logger_1.Logger.log('DEBUG', 'Delete requested');
                 let del = req.params.delete;
-                del = JSON.parse(del);
-                del = del.title;
-                yield fsPromises.rmdir(this.db.dbpath + '/' + del, { recursive: true });
-                res.status(200).send({ success: true, message: `${del} was deleted.` });
+                let objectified = JSON.parse(del);
+                del = objectified.title;
+                let qdb = yield this.db.deleteManga(del);
+                if (qdb.success) {
+                    res.status(200).send({ success: true, message: `${del} was deleted.` });
+                }
+                else {
+                    res.status(500).send({ success: false, message: 'Failed to delete. Check logs' });
+                }
             }));
         });
     }
@@ -218,9 +172,9 @@ class Server {
         this.app.get('/newcol/:colinfo', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'New Collection Requested');
             let newCollectionInfo = req.params.colinfo;
-            newCollectionInfo = JSON.parse(newCollectionInfo);
-            let collectionName = newCollectionInfo.name;
-            let collectionContents = newCollectionInfo.mangas;
+            let objectified = JSON.parse(newCollectionInfo);
+            let collectionName = objectified.name;
+            let collectionContents = objectified.mangas;
             let result = this.cdb.newCollection(collectionName, collectionContents);
             if (result)
                 res.status(200).send({ success: true, message: `New collection created.` });

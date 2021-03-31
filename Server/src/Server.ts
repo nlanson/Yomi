@@ -11,7 +11,7 @@ import { Database } from './Database';
 import { UploadHandler } from './UploadHandler'
 import { Logger } from './Common/Logger';
 import { CollectionEngine } from './Collections/CollectionEngine';
-import { CollectionMangaData } from './Common/Interfaces';
+import { CollectionMangaData, dbapi_common_interface } from './Common/CommonInterfaces';
 
 //Config
 const port = 6969; //Default port for the Yomi Server.
@@ -64,47 +64,36 @@ export class Server {
         Start MangaDB API Endpoints
     */
     
-    private searchByTitle() { //Search the manga by title using api request /manga/{title}
-                      //Returns the Manga info such as title, path and page count as well as array of page paths.
+    private searchByTitle(): void { //Search the manga by title using api request /manga/{title}
+                      //Returns the Manga info
+        //Req Params is a single string.
         this.app.get('/manga/:title', (req: any, res: any) => {
-            let search = req.params.title;
-            Logger.log('DEBUG', `Searched requested for ${search}`)
-            
-            let found: boolean = false;
-            let i:number = 0;
-            while ( i < this.db.mangadb.length && found == false ) {
-                if ( this.db.mangadb[i].title == req.params.title ) {
-                    found = true;
-                    res.status(200).send(this.db.mangadb[i]);
-                }
-                i++
-            }
+            let search: string = req.params.title;
+            Logger.log('DEBUG', `Searched requested for ${search}`);
 
-            if ( found == false ) {
+            let qdb: dbapi_common_interface = this.db.searchByTitle(search);
+            if ( qdb.success ) {
+                res.status(200).send(qdb.content);
+            } else {
                 res.status(404).send({success: false, message: 'Manga not found'});
                 Logger.log("ERROR", "Manga not found in search");
             }
         });
     }
 
-    private listdb() { //List the DB to api request /list.
+    private listdb(): void { //List the DB to api request /list.
                // Can be used to list all manga in the DB to click and open.
         this.app.get('/list', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'List requested')
-            let list = [];
-            for (let manga in this.db.mangadb) {
-                const listEntry = (({ pages, ...manga }) => manga)(this.db.mangadb[manga]) // Remove pages property from mangadb entries and push into list.
-                list.push(listEntry);
-            }
-            
-            res.status(200).send(list);
+            let list: dbapi_common_interface = this.db.list();
+            res.status(200).send(list.content);
         });
     }
 
-    private refreshdb() { //Refreshes the DB
+    private refreshdb(): void { //Refreshes the DB
         this.app.get('/refresh', async (req: any, res: any) => {
             Logger.log('DEBUG', 'Refresh requested')
-            let status = await this.db.refresh();
+            let status: boolean = await this.db.refresh(); //re inits the db.
 
             if ( status == true ) {
                 res.status(200).send({success: true, message: 'Refresed.'});
@@ -112,50 +101,25 @@ export class Server {
         })
     }
 
-    private editManga() {
+    private async editManga(): Promise<void> {
+        interface EditMangaReqParams {
+            title: string, //OldName
+            edit: string //New Name
+        }
+
         this.app.get('/editmanga/:edit', async (req: any, res: any) => {
             Logger.log(`DEBUG`, 'Edit requested')
-            let edit = req.params.edit;
-            edit = JSON.parse(edit);
-            let ogName = edit.title;
-            let newName = edit.edit;
-            
-            let i = 0;
-            let found: Boolean = false;
-            let message: any;
-            while ( i < this.db.mangadb.length && found == false ) { //Loop through every manga
-                if ( this.db.mangadb[i].title == ogName ) { //If ogname equals any manga in the db then..,
-                    found = true;
+            let edit: string = req.params.edit;
+            let objectified: EditMangaReqParams = JSON.parse(edit);
+            let ogName: string = objectified.title;
+            let newName = objectified.edit;
 
-                    this.db.mangadb[i].title = newName; //Set manga title to the new name
-                    fs.rename(this.db.mangadb[i].path, this.db.dbpath + '/' +newName, (err) => { //Rename old manga path to new manga path.
-                        if (err) { message = err;  Logger.log('ERROR', `${err.message}`); }
-                        else Logger.log(`DEBUG`, `Successfully Edited ${ogName} -> ${newName}`);
-                        this.db.refresh(); //Refresh DB
-                        
-                        if (!message) { 
-                            message = 'Success';
-                            res.status(200).send({success: true, message: message}); // Full success
-                        } else{
-                            res.status(500).send({success: false, message: message}); //Partial success. Manga was valid but rename failed.
-                            Logger.log(`ERROR`, 'Edit partially successful. Manga was found but rename failed.');
-                        }
-                        
-                    });
-                }
-                i++;
-            }
+            let qdb: dbapi_common_interface = await this.db.editMangaName(ogName, newName);
 
-            //If no match was found, then response with 'manga not found'
-            if ( found == false ) {
-                Logger.log(`ERROR`, 'Edit request manga not found.')
-                message = 'Manga not found';
-                let response = {
-                    success: found,
-                    message: message
-                }
-                res.status(404).send(response); //Respond with found = false and manga not found.
-                Logger.log(`ERROR`, 'Manga to edit not found.');
+            if ( qdb.success ) {
+                res.status(200).send({success: qdb.success, message: qdb.message}); // Full success
+            } else {
+                res.status(500).send({success: qdb.success, message: qdb.message}); //Partial success. Manga was valid but rename failed.
             }
         });
     }
@@ -204,16 +168,24 @@ export class Server {
         });
     }
 
-    private async deleteManga() {
+    private async deleteManga(): Promise<void> {
+        interface DeleteMangaReqParams {
+            title: string
+        }
+
         this.app.get('/deletemanga/:delete', async (req: Request, res: Response) => {
             Logger.log('DEBUG', 'Delete requested');
-            let del: any = req.params.delete;
-            del = JSON.parse(del);
-            del = del.title;
+            let del: string = req.params.delete;
+            let objectified: DeleteMangaReqParams = JSON.parse(del);
+            del = objectified.title;
 
-            await fsPromises.rmdir(this.db.dbpath + '/' + del, { recursive: true });
+            let qdb: dbapi_common_interface = await this.db.deleteManga(del);
 
-            res.status(200).send({success: true, message: `${del} was deleted.`});
+            if ( qdb.success ) {
+                res.status(200).send({success: true, message: `${del} was deleted.`});
+            } else {
+                res.status(500).send({success: false, message: 'Failed to delete. Check logs'});
+            }
         });
     }
 
@@ -221,15 +193,20 @@ export class Server {
         Start CollectionEngine API Endpoints
     */
 
-    private newCollection() {
+    private newCollection(): void {
+        interface NewColReqParams {
+            name: string,
+            mangas: Array<CollectionMangaData>
+        }
+        
         this.app.get('/newcol/:colinfo', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'New Collection Requested')
-            let newCollectionInfo = req.params.colinfo;
-            newCollectionInfo = JSON.parse(newCollectionInfo);
-            let collectionName: string = newCollectionInfo.name;
-            let collectionContents: Array<CollectionMangaData> = newCollectionInfo.mangas;
+            let newCollectionInfo: string = req.params.colinfo;
+            let objectified: NewColReqParams = JSON.parse(newCollectionInfo);
+            let collectionName: string = objectified.name;
+            let collectionContents: Array<CollectionMangaData> = objectified.mangas;
 
-            let result = this.cdb.newCollection(collectionName, collectionContents);
+            let result: Boolean = this.cdb.newCollection(collectionName, collectionContents);
             if ( result ) res.status(200).send({success: true, message: `New collection created.`});
             else res.status(500).send({success: false, message: `Collection creation failed.`});
         });

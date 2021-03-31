@@ -2,6 +2,7 @@
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
+import { dbapi_common_interface } from './Common/CommonInterfaces';
 
 //Internal
 import { Logger } from './Common/Logger';
@@ -138,14 +139,132 @@ export class Database {
         })
     }
 
+    /*
+    API FUNCTIONS
+    */
+
+    public searchByTitle(title: string): dbapi_common_interface {
+        console.log('query received')
+        let found: boolean = false;
+        let i:number = 0;
+        while ( i < this.mangadb.length && found == false ) {
+            if ( this.mangadb[i].title == title ) {
+                found = true;
+                return {
+                    success: true,
+                    message: "Found",
+                    content: this.mangadb[i]
+                }
+            }
+            i++
+        }
+
+        if ( found == false ) {
+            return {
+                success: false,
+                message: "Manga not found.",
+                content: null
+            }
+        } else { //fallback
+            return {
+                success: false,
+                message: "Error",
+                content: null
+            }
+        }
+    }
+
+    public list(): dbapi_common_interface {
+        let list = [];
+        for (let manga in this.mangadb) {
+            const listEntry = (({ pages, ...manga }) => manga)(this.mangadb[manga]) // Remove pages property from mangadb entries and push into list.
+            list.push(listEntry);
+        }
+
+        return {success: true, message: 'list compiled', content: list}
+    }
+
+    public async editMangaName(o: string, n: string): Promise<dbapi_common_interface> {
+        let i = 0; //Loop iterator
+        let found: Boolean = false; //Was the manga found?
+        let message: any; //return message for the API
+        let flag: boolean = true; //Flag for checking if FS failed or not.
+
+        while ( i < this.mangadb.length && found == false ) { //Loop through every manga
+            if ( this.mangadb[i].title == o ) { //If ogname equals any manga in the db then..,
+                found = true;
+                this.mangadb[i].title = n; //Set manga title to the new name
+                
+                //rename directory in db
+                try {
+                    await fsPromises.rename(this.mangadb[i].path, this.dbpath + '/' +n);
+                } catch(e) {
+                    flag = false;
+                    Logger.log(`ERROR`, 'Edit Failed');
+                    message = "Rename failed. Manga exists but FS failed.";
+                    return {success: false, message: message, content: null} //Rename failed. Manga exists but FS failed.
+                }
+                
+                //If rename is successful, code will enter this condition.
+                if (flag) { 
+                    Logger.log(`DEBUG`, `Successfully Edited ${o} -> ${n}`);
+                    message = 'Edit Success';
+                    this.refresh(); //Refresh DB
+                    return {success: true, message: message, content: null}; // Full success
+                }
+            }
+            i++;
+        }
+
+        //Fallback statement for when manga is not found in the database.
+        Logger.log(`ERROR`, 'Edit request manga not found.')
+        message = 'Manga not found';
+        let response = {
+            success: false,
+            message: 'Manga not found',
+            content: null
+        }
+        return response
+    } 
+
+    public async deleteManga(title: string): Promise<dbapi_common_interface> {
+        let found: boolean = false;
+        let i = 0;
+        while (i < this.mangadb.length && found == false) {
+            if (this.mangadb[i].title = title) {
+                found = false;
+
+                //Delete directory containing manga
+                await fsPromises.rmdir(this.dbpath + '/' + title, { recursive: true });
+                //Remove entry from DB
+                this.mangadb.splice(i, 1);
+
+                Logger.log('DEBUG', `${title} was deleted`);
+                let response = {
+                    success: true,
+                    message: `Successfully Deleted`,
+                    content: null
+                }
+                return response
+            }
+        }
+
+        Logger.log('ERROR', 'Manga to delete not found');
+        let response = {
+            success: false,
+            message: `Manga not found`,
+            content: null
+        }
+        return response
+    }
+
 }//END DB Class
 
 /*
 
 Currently, the DB only performs initialisation and the API does edits, deletes and new uploads.
 
-Maybe the edit, delete and upload handling should be done in the Database class here and the method is just called by the API??
-Then the database wouldnt have to re-initiase each time a method is called.
+Need to pass upload func from Server class to Database class here.
 
 
 */

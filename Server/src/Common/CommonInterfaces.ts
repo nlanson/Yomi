@@ -18,3 +18,9 @@ export interface CollectionMangaData {
     pages: string;
     cover: string;
 }
+
+export interface dbapi_common_interface {
+    success: boolean;
+    message: string;
+    content: any;
+}

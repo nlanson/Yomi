@@ -6,7 +6,7 @@ const unzipper = require('unzipper');
 
 //Internal
 import { Database } from './Database'
-import { CommonHandlerResult } from './Common/Interfaces';
+import { CommonHandlerResult } from './Common/CommonInterfaces';
 import { Logger } from './Common/Logger';
 
 

@@ -1,5 +1,5 @@
 //Internal
-import { CollectionInterface, CollectionMangaData, CommonHandlerResult } from '../Common/Interfaces';
+import { CollectionInterface, CollectionMangaData, CommonHandlerResult } from '../Common/CommonInterfaces';
 
 export class Collection implements CollectionInterface {
     public name: string;

@@ -2,7 +2,7 @@
     Where the collections database is located and methods to create and remove collections.
 */
 
-import { CollectionMangaData } from '../Common/Interfaces';
+import { CollectionMangaData } from '../Common/CommonInterfaces';
 import { Database } from '../Database';
 import { Collection } from './Collection'
  
