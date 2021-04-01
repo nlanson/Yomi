@@ -20,7 +20,6 @@ const fs_1 = __importDefault(require("fs"));
 const fsPromises = fs_1.default.promises;
 const upload = require('express-fileupload');
 const cors = require('cors');
-const UploadHandler_1 = require("./UploadHandler");
 const Logger_1 = require("./Common/Logger");
 //Config
 const port = 6969; //Default port for the Yomi Server.
@@ -109,43 +108,25 @@ class Server {
         });
     }
     upload() {
-        this.app.get('/upload', (req, res) => {
-            res.status(405)({ status: 'failed', message: `You've requested this the wrong way.` });
-        });
-        this.app.post('/upload', (req, res) => {
-            if (req.files) {
-                Logger_1.Logger.log('DEBUG', 'Receiving upload');
-                let file = req.files.file;
-                let filename = file.name;
-                file.mv(this.db.dbpath + '/' + filename, (err) => __awaiter(this, void 0, void 0, function* () {
-                    if (err) { //If move fails return error
-                        res.status(510).send({ success: false, message: 'Failed recieving the file properly.' });
-                        Logger_1.Logger.log(`ERROR`, 'Failed receiving the file upload.');
+        return __awaiter(this, void 0, void 0, function* () {
+            this.app.get('/upload', (req, res) => {
+                res.status(405)({ status: 'failed', message: `You've requested this the wrong way.` });
+            });
+            this.app.post('/upload', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                if (req.files) {
+                    Logger_1.Logger.log('DEBUG', 'Receiving upload');
+                    let file = req.files.file;
+                    let qdb = yield this.db.upload(file);
+                    if (qdb.success) {
+                        res.status(200).send({ success: qdb.success, message: qdb.message });
                     }
                     else {
-                        Logger_1.Logger.log('DEBUG', 'Upload received, handling...');
-                        //IF move is successful:
-                        let archive = this.db.dbpath + '/' + filename;
-                        let uh = new UploadHandler_1.UploadHandler(archive, this.db);
-                        let result = yield uh.handle();
-                        switch (result.success) {
-                            case (true):
-                                res.status(200).send(result);
-                                break;
-                            case (false):
-                                res.status(200).send(result);
-                                break;
-                            default:
-                                res.status(500).send({ success: false, message: 'Handler failed to run.' });
-                                Logger_1.Logger.log('ERROR', 'Handler failed to initialise.');
-                        }
+                        res.status(500).send({ success: qdb.success, message: qdb.message });
                     }
-                }));
-            }
-            else {
-                res.status(406).send({ success: false, message: 'Failed, no file uploaded.' });
-                Logger_1.Logger.log('ERROR', 'No file uploaded.');
-            }
+                }
+                else
+                    res.status(400).send({ success: false, message: "No file received." });
+            }));
         });
     }
     deleteManga() {

@@ -2,10 +2,11 @@
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-import { dbapi_common_interface } from './Common/CommonInterfaces';
 
 //Internal
 import { Logger } from './Common/Logger';
+import { CommonHandlerResult, dbapi_common_interface } from './Common/CommonInterfaces';
+import { UploadHandler } from './UploadHandler'
 
 
 export class Database {
@@ -17,19 +18,19 @@ export class Database {
     }
 
     public async setup() { //Initial DB Setup
-        this.mangadb = await this.scan_dir();
-        await this.init_db();
+        this.mangadb = await this.scan_dir(true); //Verbose ON
+        await this.init_db(true);
     }
 
     public async refresh() { //For refreshing the DB from API
-        this.mangadb = await this.scan_dir();
-        await this.init_db();
+        this.mangadb = await this.scan_dir(); //Verbose OFF
+        await this.init_db(false);
         return true;
     }
     
     //Scans for any directories that could contain manga in the Database Path.
-    public scan_dir() {
-        Logger.log(`DEBUG`, 'Scanning specifed path for manga...');
+    public scan_dir(verbose?:boolean) {
+        if (verbose) Logger.log(`DEBUG`, 'Scanning specifed path for manga...');
         
         return new Promise((resolve) => {
             var mangasList: any[] = [];
@@ -45,13 +46,14 @@ export class Database {
                                 path: fileDir
                             });
                         } else {
-                            Logger.log(`DEBUG`, `Deleting ${file} as it is not a directory.`)
+                            if (verbose) Logger.log(`DEBUG`, `Deleting ${file} as it is not a directory.`);
                             fs.unlink(fileDir, (err) => {
                                 if (err) Logger.log('ERROR', `${err}`)
                             })
                         }
                     });
-                    Logger.log(`DEBUG`, 'Scan complete');
+                    
+                    if (verbose) Logger.log(`DEBUG`, 'Scan complete');
                     resolve(mangasList);
                 }
             }); 
@@ -59,12 +61,12 @@ export class Database {
     }
     
     //Initiales the DB from scanned dirs.
-    private async init_db() {
-        Logger.log('DEBUG', 'Creating Database Object');
+    private async init_db(verbose?:boolean) {
+        if (verbose) Logger.log('DEBUG', 'Creating Database Object');
         for ( let i = 0; i < this.mangadb.length; i++ ) {
             this.mangadb[i].pageCount = await this.getPageCount(this.mangadb[i].path); //Count how many files are in the path to fugure out how many pages are in the manga.
             if ( this.mangadb[i].pageCount == 0 ) {
-                Logger.log( 'DEBUG', `Deleting ${this.mangadb[i].title} as it has a page count of zero.`);
+                if (verbose) Logger.log( 'DEBUG', `Deleting ${this.mangadb[i].title} as it has a page count of zero.`);
                 fs.rmdirSync(this.mangadb[i].path, { recursive: true });
                 this.mangadb.splice(i, 1); //If there are no pages in the directory, remove it from the db.
                 continue
@@ -73,7 +75,7 @@ export class Database {
             this.mangadb[i].pages = await this.makePagesArray(this.mangadb[i].path); //Create an array of pages and their directories.
             this.mangadb[i].cover = this.addPreview(this.mangadb[i].pages) //Creates a cover property with the first page of the manga as the value.
         }
-        Logger.log('DEBUG', 'Database created.')
+        if (verbose) Logger.log('DEBUG', 'Database created.')
     }
     
     private addPreview(pages: Array<any>) {
@@ -184,6 +186,55 @@ export class Database {
         return {success: true, message: 'list compiled', content: list}
     }
 
+    public async upload(file: any): Promise<dbapi_common_interface> {
+        let filename: string = file.name;
+        let dbresponse: dbapi_common_interface;
+        
+        try {
+            await file.mv(this.dbpath + '/' + filename);
+        } catch(e) {
+            Logger.log(`ERROR`, 'Failed receiving the file upload.');
+            dbresponse = {
+                success: false,
+                message: "Failed at receiving file upload",
+                content: null
+            }
+            return dbresponse;
+        }
+
+        Logger.log('DEBUG', 'Upload received, handling...')
+
+        let archive: string = this.dbpath + '/' + filename;
+        let uh: UploadHandler = new UploadHandler(archive, this);
+        let result: CommonHandlerResult = await uh.handle();
+
+        switch (result.success) {
+            case ( true ):
+                dbresponse = {
+                    success: true,
+                    message: 'Upload successful',
+                    content: null
+                }
+                this.refresh();
+                return dbresponse
+            case ( false ):
+                dbresponse = {
+                    success: false,
+                    message: 'Upload unsuccessful',
+                    content: null
+                }
+                return dbresponse
+            default:
+                Logger.log('ERROR', 'Handler failed to instantiate.');    
+                dbresponse =  {
+                    success: false,
+                    message: "Handler failed to instantiate",
+                    content: null
+                };
+                return dbresponse
+        }
+    }
+
     public async editMangaName(o: string, n: string): Promise<dbapi_common_interface> {
         let i = 0; //Loop iterator
         let found: Boolean = false; //Was the manga found?
@@ -237,7 +288,7 @@ export class Database {
                 //Delete directory containing manga
                 await fsPromises.rmdir(this.dbpath + '/' + title, { recursive: true });
                 //Remove entry from DB
-                this.mangadb.splice(i, 1);
+                this.mangadb.splice(i, 1); //Remove deleted entry from DB
 
                 Logger.log('DEBUG', `${title} was deleted`);
                 let response = {
@@ -263,8 +314,6 @@ export class Database {
 /*
 
 Currently, the DB only performs initialisation and the API does edits, deletes and new uploads.
-
-Need to pass upload func from Server class to Database class here.
 
 
 */

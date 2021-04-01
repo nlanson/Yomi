@@ -124,47 +124,23 @@ export class Server {
         });
     }
 
-    private upload() {
+    private async upload(): Promise<void> {
         this.app.get('/upload', (req: any, res: any) => {
             res.status(405)({status: 'failed', message: `You've requested this the wrong way.`})
         })
         
-        this.app.post('/upload', (req: any, res: any) => {
+        this.app.post('/upload', async (req: any, res: any) => {
             if ( req.files ) {
                 Logger.log('DEBUG', 'Receiving upload')
                 let file = req.files.file;
-                let filename = file.name;
 
-                file.mv(this.db.dbpath + '/' + filename, async (err: any) => { //Move received upload to dbpath/upload.zip
-                    if(err) { //If move fails return error
-                        res.status(510).send({success: false, message: 'Failed recieving the file properly.'});
-                        Logger.log(`ERROR`, 'Failed receiving the file upload.');
-                    }
-                    else { 
-                        Logger.log('DEBUG', 'Upload received, handling...')
-
-                        //IF move is successful:
-                        let archive = this.db.dbpath + '/' + filename;
-                        let uh = new UploadHandler(archive, this.db);
-                        let result = await uh.handle();
-
-                        switch (result.success) {
-                            case ( true ):
-                                res.status(200).send(result);
-                                break;
-                            case ( false ):
-                                res.status(200).send(result);
-                                break;
-                            default:
-                                res.status(500).send({success: false, message: 'Handler failed to run.'});
-                                Logger.log('ERROR', 'Handler failed to initialise.');
-                        }
-                    }
-                })
-            } else {
-                res.status(406).send({success: false, message: 'Failed, no file uploaded.'});
-                Logger.log('ERROR', 'No file uploaded.');
-            }
+                let qdb: dbapi_common_interface = await this.db.upload(file);
+                if ( qdb.success ) {
+                    res.status(200).send({success: qdb.success, message: qdb.message});
+                } else {
+                    res.status(500).send({success: qdb.success, message: qdb.message});
+                }
+            } else res.status(400).send({success: false, message: "No file received."});
         });
     }
 

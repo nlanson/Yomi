@@ -36,7 +36,6 @@ export class UploadHandler {
                 await this.unarchive();
             } catch (error) {
                 Logger.log('ERROR', `${error.message}`);
-                response.success = false;
                 response.message = error.message;
                 resolve(response);
             }
@@ -44,13 +43,11 @@ export class UploadHandler {
             try {
                 await this.scan_temp();
                 if ( this.tempdb.length == 0 ) {
-                    response.success = false;
                     response.message = 'No valid files were in the archive.'
                     resolve(response);
                 }
             } catch (e) {
                 Logger.log('ERROR', `${e.message}`);
-                response.success = false;
                 response.message = e.message;
                 resolve(response);
             }
@@ -58,13 +55,11 @@ export class UploadHandler {
             try {
                 await this.pageValidator();
                 if ( this.tempdb.length == 0 ) {
-                    response.success = false;
                     response.message = 'No valid files were in the archive.'
                     resolve(response);
                 }
             } catch (e) {
                 Logger.log('ERROR', `${e.message}`);
-                response.success = false;
                 response.message = e.message;
                 resolve(response);
             }
@@ -73,7 +68,6 @@ export class UploadHandler {
                 await this.mv();
             } catch (e) {
                 Logger.log('ERROR', `${e.message}`);
-                response.success = false;
                 response.message = 'No valid files were in the archive.'
                 resolve(response);
             }
@@ -83,7 +77,6 @@ export class UploadHandler {
                 this.deleteFile(this.file);
             } catch (e) {
                 Logger.log('ERROR', `${e.message}`);
-                response.success = false;
                 response.message = 'No valid files were in the archive.'
                 resolve(response);
             }

@@ -44,35 +44,30 @@ class UploadHandler {
                 }
                 catch (error) {
                     Logger_1.Logger.log('ERROR', `${error.message}`);
-                    response.success = false;
                     response.message = error.message;
                     resolve(response);
                 }
                 try {
                     yield this.scan_temp();
                     if (this.tempdb.length == 0) {
-                        response.success = false;
                         response.message = 'No valid files were in the archive.';
                         resolve(response);
                     }
                 }
                 catch (e) {
                     Logger_1.Logger.log('ERROR', `${e.message}`);
-                    response.success = false;
                     response.message = e.message;
                     resolve(response);
                 }
                 try {
                     yield this.pageValidator();
                     if (this.tempdb.length == 0) {
-                        response.success = false;
                         response.message = 'No valid files were in the archive.';
                         resolve(response);
                     }
                 }
                 catch (e) {
                     Logger_1.Logger.log('ERROR', `${e.message}`);
-                    response.success = false;
                     response.message = e.message;
                     resolve(response);
                 }
@@ -81,7 +76,6 @@ class UploadHandler {
                 }
                 catch (e) {
                     Logger_1.Logger.log('ERROR', `${e.message}`);
-                    response.success = false;
                     response.message = 'No valid files were in the archive.';
                     resolve(response);
                 }
@@ -91,7 +85,6 @@ class UploadHandler {
                 }
                 catch (e) {
                     Logger_1.Logger.log('ERROR', `${e.message}`);
-                    response.success = false;
                     response.message = 'No valid files were in the archive.';
                     resolve(response);
                 }
