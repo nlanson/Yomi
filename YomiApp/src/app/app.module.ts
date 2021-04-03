@@ -27,6 +27,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatMenuModule} from '@angular/material/menu';
+import { CollectionFactoryComponent } from './modals/collection-factory/collection-factory.component';
 
 
 
@@ -37,7 +38,8 @@ import {MatMenuModule} from '@angular/material/menu';
     CollectionsComponent,
     EditMangaComponent,
     UploadMangaComponent,
-    ReadComponent
+    ReadComponent,
+    CollectionFactoryComponent
   ],
   imports: [
     BrowserModule,

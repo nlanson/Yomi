@@ -11,7 +11,7 @@ import { Database } from './Database';
 import { UploadHandler } from './UploadHandler'
 import { Logger } from './Common/Logger';
 import { CollectionEngine } from './Collections/CollectionEngine';
-import { CollectionMangaData, dbapi_common_interface } from './Common/CommonInterfaces';
+import { CollectionMangaData, CommonHandlerResult, dbapi_common_interface } from './Common/CommonInterfaces';
 
 //Config
 const port = 6969; //Default port for the Yomi Server.
@@ -69,7 +69,7 @@ export class Server {
         //Req Params is a single string.
         this.app.get('/manga/:title', (req: any, res: any) => {
             let search: string = req.params.title;
-            Logger.log('DEBUG', `Searched requested for ${search}`);
+            Logger.log('DEBUG', `Info for ${search} requested`);
 
             let qdb: dbapi_common_interface = this.db.searchByTitle(search);
             if ( qdb.success ) {
@@ -178,13 +178,13 @@ export class Server {
         this.app.get('/newcol/:colinfo', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'New Collection Requested')
             let newCollectionInfo: string = req.params.colinfo;
-            let objectified: NewColReqParams = JSON.parse(newCollectionInfo);
+            let objectified: NewColReqParams = JSON.parse(newCollectionInfo); //Convert newColInfo String into Object;
             let collectionName: string = objectified.name;
             let collectionContents: Array<CollectionMangaData> = objectified.mangas;
 
-            let result: Boolean = this.cdb.newCollection(collectionName, collectionContents);
-            if ( result ) res.status(200).send({success: true, message: `New collection created.`});
-            else res.status(500).send({success: false, message: `Collection creation failed.`});
+            let result: CommonHandlerResult = this.cdb.newCollection(collectionName, collectionContents);
+            if ( result.success ) res.status(200).send(result);
+            else res.status(500).send({success: result.success, message: result.message});
         });
     }
 

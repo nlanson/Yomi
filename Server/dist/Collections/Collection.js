@@ -4,6 +4,7 @@ exports.Collection = void 0;
 class Collection {
     constructor(name, mangas) {
         this.name = name;
+        this.id = 'defaultid';
         this.mangas = mangas;
         this.count = this.mangas.length;
     }

@@ -8,6 +8,7 @@ const Collection_1 = require("./Collection");
 class CollectionEngine {
     constructor(collectionpath, mdb) {
         this.coldb = [];
+        this.idCount = 1;
         this.collectionpath = collectionpath;
         this.mangadb = mdb;
     }
@@ -18,6 +19,9 @@ class CollectionEngine {
     }
     newCollection(name, mangas) {
         let newCol = new Collection_1.Collection(name, mangas);
+        //Makeshift ID System
+        newCol.id = this.idCount.toString();
+        this.idCount++;
         //validate collection entries here.
         //also perform duplicate name check OR implement collection ID system.
         //once validated, push.

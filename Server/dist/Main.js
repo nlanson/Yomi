@@ -28,7 +28,7 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let prodPath = '/data/manga';
         let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
-        yield YomiInitialiser.run(prodPath);
+        yield YomiInitialiser.run(devPath);
     });
 }
 main();

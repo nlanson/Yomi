@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { MangaData } from './MangaInterface';
 
 
 @Injectable({
@@ -72,6 +73,18 @@ export class DatabaseService {
     let delobj = {title: title};
     let delString = JSON.stringify(delobj);
     let url = this.baseurl + '/deleteManga/' + delString;
+    let res: any = await this.http.get(url, {observe: 'response'}).toPromise();
+
+    return res;
+  }
+
+  async newCollection(name:string, mangasList: Array<MangaData>): Promise<any> {
+    let requestObj = {
+      name: name,
+      mangas: mangasList
+    }
+
+    let url = this.baseurl + "/newcol/" + JSON.stringify(requestObj);
     let res: any = await this.http.get(url, {observe: 'response'}).toPromise();
 
     return res;

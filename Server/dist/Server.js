@@ -153,7 +153,7 @@ class Server {
         this.app.get('/newcol/:colinfo', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'New Collection Requested');
             let newCollectionInfo = req.params.colinfo;
-            let objectified = JSON.parse(newCollectionInfo);
+            let objectified = JSON.parse(newCollectionInfo); //Convert newColInfo String into Object;
             let collectionName = objectified.name;
             let collectionContents = objectified.mangas;
             let result = this.cdb.newCollection(collectionName, collectionContents);

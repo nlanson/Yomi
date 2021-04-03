@@ -3,11 +3,13 @@ import { CollectionInterface, CollectionMangaData, CommonHandlerResult } from '.
 
 export class Collection implements CollectionInterface {
     public name: string;
+    public id: string;
     public mangas: Array<CollectionMangaData>;
     public count: number;
     
     constructor(name: string, mangas: Array<CollectionMangaData>) {
         this.name = name;
+        this.id = 'defaultid';
         this.mangas = mangas;
         this.count = this.mangas.length;
     }
