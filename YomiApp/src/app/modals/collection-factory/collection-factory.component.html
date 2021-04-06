@@ -11,5 +11,16 @@ Wait until new collection creation result is received. (Lock user in window unti
 -->
 
 
-<!--NGFOR DEMO-->
-<p *ngFor='let manga of mangaList'>{{manga.title}}</p>
+<form [formGroup]="collectionForm" (ngSubmit)="submit()">
+  <mat-form-field appearance="fill" required>
+    <mat-label>Collection Name</mat-label>
+    <input matInput formControlName="name">
+  </mat-form-field>
+
+  <br>
+
+  <!--Need to figure out how to use formArrays to create dynamic fields that represent each manga in the db-->
+
+  <br>
+  <button mat-raised-button color='primary'>Submit</button>
+</form>

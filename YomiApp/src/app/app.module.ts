@@ -13,6 +13,7 @@ import { CollectionsComponent } from './collections/collections.component';
 import { EditMangaComponent } from './modals/edit-manga/edit-manga.component';
 import { UploadMangaComponent } from './modals/upload-manga/upload-manga.component';
 import { ReadComponent } from './read/read.component';
+import { CollectionFactoryComponent } from './modals/collection-factory/collection-factory.component';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -27,7 +28,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatMenuModule} from '@angular/material/menu';
-import { CollectionFactoryComponent } from './modals/collection-factory/collection-factory.component';
+import {MatPaginatorModule} from '@angular/material/paginator';
+
 
 
 
@@ -60,7 +62,8 @@ import { CollectionFactoryComponent } from './modals/collection-factory/collecti
     MatFormFieldModule,
     MatSnackBarModule,
     MatProgressBarModule,
-    MatMenuModule
+    MatMenuModule,
+    MatPaginatorModule
   ],
   providers: [LibraryComponent],
   bootstrap: [AppComponent]

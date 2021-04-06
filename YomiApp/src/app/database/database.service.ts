@@ -11,8 +11,8 @@ import { MangaData } from './MangaInterface';
 })
 export class DatabaseService {
 
-  baseurl:string = 'https://mdb.nlanson.ga' //Connects to the proxy for the database (My production setup)
-  //baseurl: string = 'http://localhost:6969' //Connects to local machine of the client (Testing on local machine)
+  //baseurl:string = 'https://mdb.nlanson.ga' //Connects to the proxy for the database (My production setup)
+  baseurl:string = 'http://localhost:6969' //Connects to local machine of the client (Testing on local machine)
 
   /*
     Need to find a way for users to set there own proxy url to their version of the hosted database.

@@ -24,9 +24,13 @@ class CollectionEngine {
         this.idCount++;
         //validate collection entries here.
         //also perform duplicate name check OR implement collection ID system.
+        //if manga validation fails, dont push new collection to the db and return a failure message.
         //once validated, push.
         this.coldb.push(newCol);
-        return true;
+        return {
+            success: true,
+            message: "New Collection Successfully created"
+        };
     }
     get collectionList() {
         return this.coldb;

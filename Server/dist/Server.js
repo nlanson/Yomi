@@ -61,7 +61,7 @@ class Server {
         //Req Params is a single string.
         this.app.get('/manga/:title', (req, res) => {
             let search = req.params.title;
-            Logger_1.Logger.log('DEBUG', `Searched requested for ${search}`);
+            Logger_1.Logger.log('DEBUG', `Info for ${search} requested`);
             let qdb = this.db.searchByTitle(search);
             if (qdb.success) {
                 res.status(200).send(qdb.content);
@@ -157,10 +157,10 @@ class Server {
             let collectionName = objectified.name;
             let collectionContents = objectified.mangas;
             let result = this.cdb.newCollection(collectionName, collectionContents);
-            if (result)
-                res.status(200).send({ success: true, message: `New collection created.` });
+            if (result.success)
+                res.status(200).send(result);
             else
-                res.status(500).send({ success: false, message: `Collection creation failed.` });
+                res.status(500).send({ success: result.success, message: result.message });
         });
     }
     listCollections() {

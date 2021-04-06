@@ -8,6 +8,7 @@ import { UploadMangaComponent } from '../modals/upload-manga/upload-manga.compon
 import {MatGridList} from '@angular/material/grid-list';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { MangaData } from '../database/MangaInterface';
 
 
 
@@ -19,7 +20,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class LibraryComponent implements OnInit {
   @ViewChild('grid') grid: MatGridList;
 
-  list: any;
+  list: Array<MangaData>;
 
   constructor(
     private db: DatabaseService,
