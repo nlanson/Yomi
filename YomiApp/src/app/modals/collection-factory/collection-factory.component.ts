@@ -24,7 +24,17 @@ export class CollectionFactoryComponent implements OnInit {
 
     this.collectionForm = this.fb.group({
       name: [null],
-      mangas: [null] //NEED TO MAKE A FORM ARRAY
+      mangas: this.fb.array([]) //Init new form array
+    });
+
+    const mangas = this.collectionForm.get("mangas") as FormArray; //Assign var mangas to "mangas"form array in collectionForm.
+    this.mangaList.forEach((m) => { //Push each manga into the form array.
+      mangas.push(
+        this.fb.group({
+          title: m.title,
+          selected: [null]
+        })
+      );
     });
   }
 
@@ -40,8 +50,15 @@ export class CollectionFactoryComponent implements OnInit {
 
   //Form Functions
 
+  getFormControls() {
+    return (this.collectionForm.get('mangas') as FormArray).controls;
+  }
+
   submit() {
     console.log(this.collectionForm.value);
+
+    //validate form value here (eg set checkbox null values to false)
+    //send to database service
   }
 
 }

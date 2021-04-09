@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { LibraryComponent } from './library/library.component';
 import { CollectionsComponent } from './collections/collections.component';
@@ -28,7 +28,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatMenuModule} from '@angular/material/menu';
-import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 
@@ -47,6 +47,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    FormsModule,
     ReactiveFormsModule,
     FlexLayoutModule,
     HttpClientModule,
@@ -63,7 +64,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     MatSnackBarModule,
     MatProgressBarModule,
     MatMenuModule,
-    MatPaginatorModule
+    MatCheckboxModule
   ],
   providers: [LibraryComponent],
   bootstrap: [AppComponent]

@@ -11,16 +11,27 @@ Wait until new collection creation result is received. (Lock user in window unti
 -->
 
 
-<form [formGroup]="collectionForm" (ngSubmit)="submit()">
+<form [formGroup]="collectionForm" (ngSubmit)="submit()" *ngIf='mangaList'>
+  <!-- Collection Name-->
   <mat-form-field appearance="fill" required>
     <mat-label>Collection Name</mat-label>
     <input matInput formControlName="name">
   </mat-form-field>
-
   <br>
-
-  <!--Need to figure out how to use formArrays to create dynamic fields that represent each manga in the db-->
-
+  <!-- Dynamic selection checklist
+    Implemented From:
+    https://stackoverflow.com/questions/66965294/checkbox-selections-from-an-array
+    https://stackblitz.com/edit/angular-forms-formarray-example-yomi?file=src%2Fapp%2Fapp.component.html
+  -->
+  <div *ngFor="let manga of getFormControls(); let i = index" [formGroup]="manga">
+    <div>
+      <mat-checkbox formControlName="selected">
+        {{manga.get('title').value}}
+      </mat-checkbox>
+    </div>
+  </div>
   <br>
   <button mat-raised-button color='primary'>Submit</button>
 </form>
+
+{{collectionForm.value | json}}
