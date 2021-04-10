@@ -28,17 +28,22 @@ export class CollectionEngine {
         let newCol = new Collection(name, mangas);
         
         //Makeshift ID System
+        //In future, this should be replaced with some random alphanumerical string with a duplication check.
         newCol.id = this.idCount.toString();
         this.idCount++;
-        //validate collection entries here.
-
-        //also perform duplicate name check OR implement collection ID system.
-        //if manga validation fails, dont push new collection to the db and return a failure message.
         
-        //once validated, push.
-        this.coldb.push(newCol);
+        
+        /* Validate collection entries here.
+            - Match each manga entry in the new collection to mangas in the Database. 
+            - If manga validation fails, dont push new collection to the db and return a failure message.
+            - Also remove mangas that are selected as false from the mangas array here.
+        */
 
-        return {
+        //TEMP 100% push no fail.
+        //Implement validation thingo above ^^^
+        this.coldb.push(newCol); //Push new colelction to the Collection DB.
+
+        return { //Return success.
             success: true,
             message: "New Collection Successfully created"
         };

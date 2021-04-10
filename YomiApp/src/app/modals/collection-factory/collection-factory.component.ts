@@ -1,8 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+
 import { MangaData } from 'src/app/database/MangaInterface';
 import { DatabaseService } from '../../database/database.service';
 
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-collection-factory',
@@ -16,7 +19,9 @@ export class CollectionFactoryComponent implements OnInit {
 
   constructor(
     private db: DatabaseService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private _snackBar: MatSnackBar,
+    private dialogRef: MatDialogRef<CollectionFactoryComponent>
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -54,11 +59,34 @@ export class CollectionFactoryComponent implements OnInit {
     return (this.collectionForm.get('mangas') as FormArray).controls;
   }
 
-  submit() {
-    console.log(this.collectionForm.value);
+  async submit() {
+    this.dialogRef.disableClose = true; //Disable component closing whilst sending new collection request.
+    let newColData = this.collectionForm.value;
 
-    //validate form value here (eg set checkbox null values to false)
-    //send to database service
+    for (let i=0; i < newColData.mangas.length; i++) {
+      //Check if any manga's selected value is null and if it is then set it to false.
+      if ( newColData.mangas[i].selected == null ) {
+        newColData.mangas[i].selected = false;
+      }
+    }
+
+    let r = await this.db.newCollection(newColData.name, newColData.mangas);
+    //r.body will be CommonHandlerResult so .message will contain string message on success of failure reason and .success will indicate if successful or not.
+    this.dialogRef.disableClose = false; //Enable component collapse again as the request is over.
+
+
+    //Snackbar notifications.
+    if (r.body.success)
+      this.openSnackBar("New Collection was Created Successfully!", "Awesome");
+    else
+      this.openSnackBar(r.body.message, "Okay.");
+
+  }
+
+  private openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 2000,
+    });
   }
 
 }
