@@ -65,8 +65,8 @@ export class CollectionFactoryComponent implements OnInit {
 
     for (let i=0; i < newColData.mangas.length; i++) {
       //Check if any manga's selected value is null and if it is then set it to false.
-      if ( newColData.mangas[i].selected == null ) {
-        newColData.mangas[i].selected = false;
+      if ( newColData.mangas[i].selected == null || newColData.mangas[i].selected == false ) {
+        newColData.mangas.splice(i, 1);
       }
     }
 
