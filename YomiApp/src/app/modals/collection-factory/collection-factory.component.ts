@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 
-import { MangaData } from 'src/app/database/MangaInterface';
+import { MangaData } from 'src/app/database/api.interfaces';
 import { DatabaseService } from '../../database/database.service';
 
 import {MatSnackBar} from '@angular/material/snack-bar';

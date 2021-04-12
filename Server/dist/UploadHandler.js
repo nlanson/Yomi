@@ -247,22 +247,32 @@ class UploadHandler {
     }
     mv() {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                for (let i = 0; i < this.tempdb.length; i++) {
-                    fs_1.default.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title, (err) => {
-                        if (err)
-                            reject(new Error(`Failed migrating ${this.tempdb[i].path} to live database.`));
-                    });
-                }
-                let response = { success: true, message: 'Move successful.' };
-                resolve(response);
-            });
+            for (let i = 0; i < this.tempdb.length; i++) {
+                yield fsPromises.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title).catch((e) => {
+                    if (e)
+                        throw new Error(`Failed migrating ${this.tempdb[i].path} to live database.`);
+                });
+            }
+            /*Old mv method
+                return new Promise((resolve, reject) => {
+                    for ( let i=0; i < this.tempdb.length; i++ ) {
+                        fs.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title, (err) => {
+                            if (err) reject(new Error(`Failed migrating ${this.tempdb[i].path} to live database.`))
+                        });
+                    }
+            
+                    let response: CommonHandlerResult = { success: true, message: 'Move successful.' }
+                    resolve(response);
+                });
+            */
         });
     }
     deleteDir(dir) {
-        fs_1.default.rmdir(dir, (err) => {
-            if (err)
-                throw new Error(`Directory ${dir} could not be deleted: ${err}`);
+        return __awaiter(this, void 0, void 0, function* () {
+            yield fsPromises.rmdir(dir).catch((e) => {
+                if (e)
+                    throw new Error(`Directory ${dir} could not be deleted: ${e}`);
+            });
         });
     }
     deleteFile(file) {

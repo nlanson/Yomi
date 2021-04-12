@@ -8,7 +8,7 @@ import { UploadMangaComponent } from '../modals/upload-manga/upload-manga.compon
 import {MatGridList} from '@angular/material/grid-list';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import { MangaData } from '../database/MangaInterface';
+import { MangaData } from '../database/api.interfaces';
 
 
 
@@ -54,7 +54,7 @@ export class LibraryComponent implements OnInit {
       let res = await this.db.getCoverImage(title);
       let cover: string;
       if ( res.status == 200 ) { //Need prod test
-        cover = res.body.pages[0];
+        cover = res.body.content.pages[0];
       } else if ( res.status == 411 ) {
         console.log('Manga was not found... (Cover)');
         cover = 'https://store.charteredaccountantsanz.com/sca-dev-kilimanjaro/img/no_image_available.jpeg' //Not avail jpg

@@ -324,9 +324,3 @@ class Database {
     }
 } //END DB Class
 exports.Database = Database;
-/*
-
-Currently, the DB only performs initialisation and the API does edits, deletes and new uploads.
-
-
-*/ 

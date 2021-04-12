@@ -118,9 +118,11 @@ class Server {
                     let file = req.files.file;
                     let qdb = yield this.db.upload(file);
                     if (qdb.success) {
+                        Logger_1.Logger.log(`DEBUG`, `Upload Successful!`);
                         res.status(200).send({ success: qdb.success, message: qdb.message });
                     }
                     else {
+                        Logger_1.Logger.log(`ERROR`, `Upload Failed: ${qdb.message}`);
                         res.status(500).send({ success: qdb.success, message: qdb.message });
                     }
                 }

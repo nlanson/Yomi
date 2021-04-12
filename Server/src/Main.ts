@@ -21,7 +21,7 @@ async function main() {
     let prodPath = '/data/manga';
     let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
     
-    await YomiInitialiser.run(prodPath);
+    await YomiInitialiser.run(devPath);
 }
 
 main();

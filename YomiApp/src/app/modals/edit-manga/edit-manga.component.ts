@@ -46,7 +46,7 @@ export class EditMangaComponent implements OnInit {
     } else if ( res.status > 400 && res.status < 500 ) {
       console.log(`edit was invalid`);
       this.openSnackBar('Edit Failed Miserably (Invalid)', 'RIP');
-    } else if ( res.staus > 500 ) {
+    } else if ( res.status > 500 ) {
       console.log('edit request was valid but rename failed.');
       this.openSnackBar('Edit Failed. Have another shot at it.', 'Ok!');
     }

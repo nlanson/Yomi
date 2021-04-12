@@ -225,26 +225,34 @@ export class UploadHandler {
         });
     }
 
-    private async mv(): Promise<CommonHandlerResult> {
-        return new Promise((resolve, reject) => {
-            for ( let i=0; i < this.tempdb.length; i++ ) {
-                fs.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title, (err) => {
-                    if (err) reject(new Error(`Failed migrating ${this.tempdb[i].path} to live database.`))
-                });
-            }
-    
-            let response: CommonHandlerResult = { success: true, message: 'Move successful.' }
-            resolve(response);
-        });   
+    private async mv(): Promise<void>/*Promise<CommonHandlerResult>*/ {
+        for ( let i=0; i < this.tempdb.length; i++ ) {
+            await fsPromises.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title).catch((e) => {
+                if (e) throw new Error(`Failed migrating ${this.tempdb[i].path} to live database.`);
+            });
+        }
+        
+        /*Old mv method
+            return new Promise((resolve, reject) => {
+                for ( let i=0; i < this.tempdb.length; i++ ) {
+                    fs.rename(this.tempdb[i].path, this.db.dbpath + '/' + this.tempdb[i].title, (err) => {
+                        if (err) reject(new Error(`Failed migrating ${this.tempdb[i].path} to live database.`))
+                    });
+                }
+        
+                let response: CommonHandlerResult = { success: true, message: 'Move successful.' }
+                resolve(response);
+            });
+        */   
     }
 
-    private deleteDir(dir: string) {
-        fs.rmdir(dir, (err) => {
-            if (err) throw new Error(`Directory ${dir} could not be deleted: ${err}`);
+    private async deleteDir(dir: string): Promise<void> {
+        await fsPromises.rmdir(dir).catch((e) => {
+            if (e) throw new Error(`Directory ${dir} could not be deleted: ${e}`);
         });
     }
 
-    private deleteFile(file: string) {
+    private deleteFile(file: string): void {
         fs.unlink(file, (err) => {
             if (err) throw new Error(`File ${file} could not be deleted: ${err}`);
         })

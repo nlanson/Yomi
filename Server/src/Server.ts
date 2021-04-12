@@ -8,10 +8,9 @@ const cors = require('cors');
 
 //Internal
 import { Database } from './Database';
-import { UploadHandler } from './UploadHandler'
 import { Logger } from './Common/Logger';
 import { CollectionEngine } from './Collections/CollectionEngine';
-import { CollectionMangaData, CommonHandlerResult, dbapi_common_interface } from './Common/CommonInterfaces';
+import { CollectionMangaData, CommonHandlerResult } from './Common/CommonInterfaces';
 
 //Config
 const port = 6969; //Default port for the Yomi Server.
@@ -71,7 +70,7 @@ export class Server {
             let search: string = req.params.title;
             Logger.log('DEBUG', `Info for ${search} requested`);
 
-            let qdb: dbapi_common_interface = this.db.searchByTitle(search);
+            let qdb: CommonHandlerResult = this.db.searchByTitle(search);
             if ( qdb.success ) {
                 res.status(200).send(qdb.content);
             } else {
@@ -85,7 +84,7 @@ export class Server {
                // Can be used to list all manga in the DB to click and open.
         this.app.get('/list', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'List requested')
-            let list: dbapi_common_interface = this.db.list();
+            let list: CommonHandlerResult = this.db.list();
             res.status(200).send(list.content);
         });
     }
@@ -114,7 +113,7 @@ export class Server {
             let ogName: string = objectified.title;
             let newName = objectified.edit;
 
-            let qdb: dbapi_common_interface = await this.db.editMangaName(ogName, newName);
+            let qdb: CommonHandlerResult = await this.db.editMangaName(ogName, newName);
 
             if ( qdb.success ) {
                 res.status(200).send({success: qdb.success, message: qdb.message}); // Full success
@@ -134,10 +133,12 @@ export class Server {
                 Logger.log('DEBUG', 'Receiving upload')
                 let file = req.files.file;
 
-                let qdb: dbapi_common_interface = await this.db.upload(file);
+                let qdb: CommonHandlerResult = await this.db.upload(file);
                 if ( qdb.success ) {
+                    Logger.log(`DEBUG`, `Upload Successful!`);
                     res.status(200).send({success: qdb.success, message: qdb.message});
                 } else {
+                    Logger.log(`ERROR`, `Upload Failed: ${qdb.message}`);
                     res.status(500).send({success: qdb.success, message: qdb.message});
                 }
             } else res.status(400).send({success: false, message: "No file received."});
@@ -155,7 +156,7 @@ export class Server {
             let objectified: DeleteMangaReqParams = JSON.parse(del);
             del = objectified.title;
 
-            let qdb: dbapi_common_interface = await this.db.deleteManga(del);
+            let qdb: CommonHandlerResult = await this.db.deleteManga(del);
 
             if ( qdb.success ) {
                 res.status(200).send({success: true, message: `${del} was deleted.`});

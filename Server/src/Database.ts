@@ -5,7 +5,7 @@ import path from 'path';
 
 //Internal
 import { Logger } from './Common/Logger';
-import { CommonHandlerResult, dbapi_common_interface } from './Common/CommonInterfaces';
+import { CommonHandlerResult } from './Common/CommonInterfaces';
 import { UploadHandler } from './UploadHandler'
 
 
@@ -145,7 +145,7 @@ export class Database {
     API FUNCTIONS
     */
 
-    public searchByTitle(title: string): dbapi_common_interface {
+    public searchByTitle(title: string): CommonHandlerResult {
         console.log('query received')
         let found: boolean = false;
         let i:number = 0;
@@ -176,7 +176,7 @@ export class Database {
         }
     }
 
-    public list(): dbapi_common_interface {
+    public list(): CommonHandlerResult {
         let list = [];
         for (let manga in this.mangadb) {
             const listEntry = (({ pages, ...manga }) => manga)(this.mangadb[manga]) // Remove pages property from mangadb entries and push into list.
@@ -186,9 +186,9 @@ export class Database {
         return {success: true, message: 'list compiled', content: list}
     }
 
-    public async upload(file: any): Promise<dbapi_common_interface> {
+    public async upload(file: any): Promise<CommonHandlerResult> {
         let filename: string = file.name;
-        let dbresponse: dbapi_common_interface;
+        let dbresponse: CommonHandlerResult;
         
         try {
             await file.mv(this.dbpath + '/' + filename);
@@ -235,7 +235,7 @@ export class Database {
         }
     }
 
-    public async editMangaName(o: string, n: string): Promise<dbapi_common_interface> {
+    public async editMangaName(o: string, n: string): Promise<CommonHandlerResult> {
         let i = 0; //Loop iterator
         let found: Boolean = false; //Was the manga found?
         let message: any; //return message for the API
@@ -278,7 +278,7 @@ export class Database {
         return response
     } 
 
-    public async deleteManga(title: string): Promise<dbapi_common_interface> {
+    public async deleteManga(title: string): Promise<CommonHandlerResult> {
         let found: boolean = false;
         let i = 0;
         while (i < this.mangadb.length && found == false) {
@@ -310,10 +310,3 @@ export class Database {
     }
 
 }//END DB Class
-
-/*
-
-Currently, the DB only performs initialisation and the API does edits, deletes and new uploads.
-
-
-*/

@@ -23,9 +23,11 @@ class CollectionEngine {
         //In future, this should be replaced with some random alphanumerical string with a duplication check.
         newCol.id = this.idCount.toString();
         this.idCount++;
-        //validate collection entries here.
-        //Match each manga entry in the new collection to mangas in the Database. 
-        //if manga validation fails, dont push new collection to the db and return a failure message.
+        /* Validate collection entries here.
+            - Match each manga entry in the new collection to mangas in the Database.
+            - If manga validation fails, dont push new collection to the db and return a failure message.
+            - Also remove mangas that are selected as false from the mangas array here.
+        */
         //TEMP 100% push no fail.
         //Implement validation thingo above ^^^
         this.coldb.push(newCol); //Push new colelction to the Collection DB.

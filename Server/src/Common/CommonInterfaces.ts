@@ -1,6 +1,7 @@
 export interface CommonHandlerResult {
     success: Boolean,
-    message: string
+    message: string,
+    content?: any
 }
 
 export interface CollectionInterface {
@@ -17,10 +18,4 @@ export interface CollectionMangaData {
     path: string;
     pageCount: number;
     cover: string;
-}
-
-export interface dbapi_common_interface {
-    success: boolean;
-    message: string;
-    content: any;
 }
