@@ -1,4 +1,16 @@
-<p>collections works!</p>
+<div class='header'>
+  <h1> Your Collections: </h1>
+</div>
+
+<!-- Test Collection List-->
+<div *ngFor="let collection of collections">
+  <h3> {{ collection.name }}</h3>
+  <ul>
+    <li *ngFor="let manga of collection.mangas">{{manga.title}}</li>
+  </ul>
+</div>
+
+<br>
 <button mat-raised-button color='primary' (click)='openCollectionFactory()'>Open Factory</button>
 
 <!--

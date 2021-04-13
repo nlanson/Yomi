@@ -93,7 +93,7 @@ export class DatabaseService {
   async getCollections(): Promise<HttpResponse<any>> {
     let url = this.baseurl + '/listcollections/';
 
-    let list: any = await this.http.get(url, {observe: 'response'}).toPromise();
+    let list: HttpResponse<any> = await this.http.get(url, {observe: 'response'}).toPromise();
     return list;
   }
 
