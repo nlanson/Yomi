@@ -63,10 +63,20 @@ export class CollectionFactoryComponent implements OnInit {
     this.dialogRef.disableClose = true; //Disable component closing whilst sending new collection request.
     let newColData = this.collectionForm.value;
 
-    for (let i=0; i < newColData.mangas.length; i++) {
-      //Check if any manga's selected value is null and if it is then set it to false.
+    if ( newColData.name == null || newColData.name == '' ) {
+      //Warn user that name cannot be null
+      console.log('Name cannot be empty.');
+    }
+
+    //Thanks to https://stackoverflow.com/questions/49021164/splice-not-removing-element-from-array
+    let i=0;
+    while (i<newColData.mangas.length) {
       if ( newColData.mangas[i].selected == null || newColData.mangas[i].selected == false ) {
         newColData.mangas.splice(i, 1);
+      } else {
+        //Remove the 'selected' value from the entry to make compatible with server.
+        delete newColData.mangas[i].selected;
+        i++;
       }
     }
 
@@ -90,3 +100,9 @@ export class CollectionFactoryComponent implements OnInit {
   }
 
 }
+
+/*
+  Todo for collection factory:
+    Make form look better.
+    Make form give red warning if fields are unfiled (eg No manga selected or no name entered.)
+*/

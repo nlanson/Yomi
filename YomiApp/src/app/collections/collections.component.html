@@ -6,7 +6,7 @@
 <div *ngFor="let collection of collections">
   <h3> {{ collection.name }}</h3>
   <ul>
-    <li *ngFor="let manga of collection.mangas">{{manga.title}}</li>
+    <li *ngFor="let manga of collection.mangas"><a (click)='read(manga.title)'>{{manga.title}}</a></li>
   </ul>
 </div>
 

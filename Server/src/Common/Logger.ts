@@ -1,3 +1,7 @@
+import chalk  from 'chalk';
+
+type Colour = `white` | `red` | `green` | `yellow` | 'magenta';
+
 export class Logger {
     constructor() { }
     
@@ -14,11 +18,31 @@ export class Logger {
     
     public static log(level: string, message: string): void {
         let time = this.getCurrentTime();
+        let colour: Colour;
+
+        switch(level) {
+            case 'ERROR':
+                colour = 'red';
+                break;
+            case `DEBUG`:
+                colour = 'yellow';
+                break;
+            case `WARNING`:
+                colour = 'magenta';
+                break;
+            case `INFO`:
+                colour = `green`;
+                break;
+            default:
+                colour = 'white';
+        }
         
-        console.log(`${level} [${time}] - ${message}`);
+        console.log(chalk[colour](level) + `[${time}] - ${message}`)
     }
 
     private static IntTwoChars(i: number) {
         return (`0${i}`).slice(-2);
     }
 }
+
+

@@ -15,7 +15,4 @@ export interface CollectionInterface {
 
 export interface CollectionMangaData {
     title: string;
-    path: string;
-    pageCount: number;
-    cover: string;
 }

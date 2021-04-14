@@ -31,6 +31,14 @@ const path_1 = __importDefault(require("path"));
 //Internal
 const Logger_1 = require("./Common/Logger");
 const UploadHandler_1 = require("./UploadHandler");
+/*
+    Manga Structure:
+        pageCount,
+        pages,
+        title,
+        path,
+        cover
+*/
 class Database {
     constructor(dbpath) {
         this.dbpath = dbpath;

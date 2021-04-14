@@ -180,12 +180,25 @@ export class Server {
             Logger.log(`DEBUG`, 'New Collection Requested')
             let newCollectionInfo: string = req.params.colinfo;
             let objectified: NewColReqParams = JSON.parse(newCollectionInfo); //Convert newColInfo String into Object;
+
             let collectionName: string = objectified.name;
             let collectionContents: Array<CollectionMangaData> = objectified.mangas;
 
+            console.log(collectionContents);
+            
+            if (collectionContents.length == 0) {
+                res.status(200).send({success: false, message: 'No mangas selected'});
+                return;
+            }
+
             let result: CommonHandlerResult = this.cdb.newCollection(collectionName, collectionContents);
-            if ( result.success ) res.status(200).send(result);
-            else res.status(500).send({success: result.success, message: result.message});
+            if ( result.success ) res.status(200).send(result); //Success
+            else {// On collection creation error
+                //Send back with content
+                if (result.content) res.status(500).send({success: result.success, message: result.message, content: result.content});
+                //Send back without content
+                else res.status(500).send({success: result.success, message: result.message});
+            }
         });
     }
 

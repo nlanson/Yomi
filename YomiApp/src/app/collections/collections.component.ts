@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router'
 import { DatabaseService } from '../database/database.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
@@ -17,6 +18,7 @@ export class CollectionsComponent implements OnInit {
   constructor(
     private db: DatabaseService,
     private dialog: MatDialog,
+    private router: Router
   ) {
     this.getCollections();
   }
@@ -45,6 +47,16 @@ export class CollectionsComponent implements OnInit {
     }
   }
 
+  read(title) {
+    console.log(`read ${title}`);
+    this.router.navigate(['read', title]);
+  }
+
 
 
 }
+
+/*
+  Todo for collection page:
+    - List out collections better
+*/

@@ -9,6 +9,15 @@ import { CommonHandlerResult } from './Common/CommonInterfaces';
 import { UploadHandler } from './UploadHandler'
 
 
+/*
+    Manga Structure:
+        pageCount,
+        pages,
+        title,
+        path,
+        cover
+*/
+
 export class Database {
     public dbpath: string;
     public mangadb: any;

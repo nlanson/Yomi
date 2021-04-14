@@ -158,11 +158,22 @@ class Server {
             let objectified = JSON.parse(newCollectionInfo); //Convert newColInfo String into Object;
             let collectionName = objectified.name;
             let collectionContents = objectified.mangas;
+            console.log(collectionContents);
+            if (collectionContents.length == 0) {
+                res.status(200).send({ success: false, message: 'No mangas selected' });
+                return;
+            }
             let result = this.cdb.newCollection(collectionName, collectionContents);
             if (result.success)
-                res.status(200).send(result);
-            else
-                res.status(500).send({ success: result.success, message: result.message });
+                res.status(200).send(result); //Success
+            else { // On collection creation error
+                //Send back with content
+                if (result.content)
+                    res.status(500).send({ success: result.success, message: result.message, content: result.content });
+                //Send back without content
+                else
+                    res.status(500).send({ success: result.success, message: result.message });
+            }
         });
     }
     listCollections() {

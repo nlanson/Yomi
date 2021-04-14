@@ -4,6 +4,7 @@
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CollectionEngine = void 0;
+const Logger_1 = require("../Common/Logger");
 const Collection_1 = require("./Collection");
 class CollectionEngine {
     constructor(collectionpath, mdb) {
@@ -23,18 +24,41 @@ class CollectionEngine {
         //In future, this should be replaced with some random alphanumerical string with a duplication check.
         newCol.id = this.idCount.toString();
         this.idCount++;
+        let titlesNotFound = [];
+        for (let i = 0; i < mangas.length; i++) {
+            let found = false;
+            let j = 0;
+            while (!found && j < this.mangadb.mangadb.length) {
+                if (mangas[i].title == this.mangadb.mangadb[j].title) {
+                    found = true;
+                }
+                j++;
+            }
+            if (!found) {
+                Logger_1.Logger.log(`ERROR`, `${mangas[i].title} does not exist.`);
+                titlesNotFound.push(mangas[i]);
+            }
+        }
+        if (titlesNotFound.length == 0) {
+            Logger_1.Logger.log(`INFO`, `New collection successfully created.`);
+            this.coldb.push(newCol); //Push new colelction to the Collection DB.
+            return {
+                success: true,
+                message: "New Collection Successfully created"
+            };
+        }
+        else {
+            Logger_1.Logger.log(`ERROR`, `New collection was not created as invalid manga was detected.`);
+            return {
+                success: false,
+                message: "Invalid manga contained in request.",
+                content: JSON.stringify(titlesNotFound)
+            };
+        }
         /* Validate collection entries here.
             - Match each manga entry in the new collection to mangas in the Database.
             - If manga validation fails, dont push new collection to the db and return a failure message.
-            - Also remove mangas that are selected as false from the mangas array here.
         */
-        //TEMP 100% push no fail.
-        //Implement validation thingo above ^^^
-        this.coldb.push(newCol); //Push new colelction to the Collection DB.
-        return {
-            success: true,
-            message: "New Collection Successfully created"
-        };
     }
     get collectionList() {
         return this.coldb;
