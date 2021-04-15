@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
 import { MangaData } from 'src/app/database/api.interfaces';
 import { DatabaseService } from '../../database/database.service';
@@ -16,6 +16,10 @@ export class CollectionFactoryComponent implements OnInit {
 
   public mangaList: Array<MangaData>;
   public collectionForm: FormGroup;
+  public FormError: any = {
+    nullName: false,
+    nullManga: false,
+  }
 
   constructor(
     private db: DatabaseService,
@@ -28,7 +32,7 @@ export class CollectionFactoryComponent implements OnInit {
     await this.getList();
 
     this.collectionForm = this.fb.group({
-      name: [null],
+      name: [null, Validators.required],
       mangas: this.fb.array([]) //Init new form array
     });
 
@@ -60,12 +64,21 @@ export class CollectionFactoryComponent implements OnInit {
   }
 
   async submit() {
-    this.dialogRef.disableClose = true; //Disable component closing whilst sending new collection request.
+    //Reset form error values.
+    this.FormError = {
+      nullName: false,
+      nullManga: false
+    }
+
+    //Disable component closing whilst sending new collection request.
+    this.dialogRef.disableClose = true;
+    //Assign form value to variable.
     let newColData = this.collectionForm.value;
 
+    //Check if collection name field is empty.
     if ( newColData.name == null || newColData.name == '' ) {
-      //Warn user that name cannot be null
-      console.log('Name cannot be empty.');
+      this.FormError.nullName = true;
+      return;
     }
 
     //Thanks to https://stackoverflow.com/questions/49021164/splice-not-removing-element-from-array
@@ -85,11 +98,16 @@ export class CollectionFactoryComponent implements OnInit {
     this.dialogRef.disableClose = false; //Enable component collapse again as the request is over.
 
 
-    //Snackbar notifications.
+    //Snackbar notifications + no manga selected error.
     if (r.body.success)
       this.openSnackBar("New Collection was Created Successfully!", "Awesome");
-    else
+    else if (r.body.message == 'No mangas selected') {
+      this.FormError.nullManga = true;
+      return;
+    } else
       this.openSnackBar(r.body.message, "Okay.");
+
+
 
   }
 
