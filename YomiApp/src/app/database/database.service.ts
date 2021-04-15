@@ -97,5 +97,9 @@ export class DatabaseService {
     return list;
   }
 
+  async deleteCollection(id: number) {
+    //Delete a collection by ID or by collection name.
+  }
+
 
 }
