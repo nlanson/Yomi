@@ -57,12 +57,12 @@ export class CollectionFactoryComponent implements OnInit {
     }
   }
 
-  //Form Functions
-
+  //Return form array.
   getFormControls() {
     return (this.collectionForm.get('mangas') as FormArray).controls;
   }
 
+  //On new collection submission.
   async submit() {
     //Reset form error values.
     this.FormError = {
@@ -93,21 +93,22 @@ export class CollectionFactoryComponent implements OnInit {
       }
     }
 
-    let r = await this.db.newCollection(newColData.name, newColData.mangas);
-    //r.body will be CommonHandlerResult so .message will contain string message on success of failure reason and .success will indicate if successful or not.
-    this.dialogRef.disableClose = false; //Enable component collapse again as the request is over.
-
-    //Snackbar notifications + no manga selected error.
-    if (r.success)
-      this.openSnackBar("New Collection was Created Successfully!", "Awesome");
-    else if (r.message == 'No mangas selected') {
-      this.FormError.nullManga = true;
-      return;
-    } else
-      this.openSnackBar(r.message, "Okay.");
-
-
-
+    let r;
+    this.db.newCollection(newColData.name, newColData.mangas).subscribe(
+      data => {
+        r = data.body;
+        console.log(r);
+        if (r.success)
+          this.openSnackBar("New Collection was Created Successfully!", "Awesome");
+      },
+      err => {
+        r = err.error;
+        console.log(r);
+        if (r.message == "No mangas selected")
+          this.FormError.nullManga = true;
+        else // Other HTTP Errors
+          this.openSnackBar(r.message, "Okay.");
+    });
   }
 
   private openSnackBar(message: string, action: string) {

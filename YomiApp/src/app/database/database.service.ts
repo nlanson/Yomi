@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { HttpClient, HttpEvent, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { CommonAPIResult, MangaData } from './api.interfaces';
@@ -55,6 +55,8 @@ export class DatabaseService {
     let url = this.baseurl + '/editManga/' + editString;
     let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
 
+    //Might need error handling.
+
     return res;
   }
 
@@ -78,23 +80,21 @@ export class DatabaseService {
     return res;
   }
 
-  async newCollection(name:string, mangasList: Array<MangaData>): Promise<CommonAPIResult> {
+  /*
+    Collection Functions
+  */
+
+    //Implemented fancy observable returning here. Use this as reference and restructure other functions.
+    public newCollection(name:string, mangasList: Array<MangaData>): Observable<HttpResponse<CommonAPIResult>> {
     let requestObj = {
       name: name,
       mangas: mangasList
     }
 
     let url = this.baseurl + "/collections/new/" + JSON.stringify(requestObj);
-    //let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+    let res: Observable<HttpResponse<CommonAPIResult>> = this.http.get<CommonAPIResult>(url, {observe: 'response'})
 
-    try {
-      var res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-    } catch (e) {
-      if (e.error) console.log(e.error.message);
-      return e.error;
-    }
-
-    return res.body;
+    return res;
   }
 
   async getCollections(): Promise<HttpResponse<any>> {
@@ -107,12 +107,13 @@ export class DatabaseService {
   async deleteCollection(id: string): Promise<CommonAPIResult> {
     //Delete a collection by ID.
     let url = this.baseurl + `/collections/delete/${id}`
-    let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+    let res: HttpResponse<CommonAPIResult>;
 
     try {
-      let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+      res = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
     } catch (e) {
-      if (e.error) return e.error;
+      if (e.error)
+        return e.error;
     }
     return res.body;
   }
