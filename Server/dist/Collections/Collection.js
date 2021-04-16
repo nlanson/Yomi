@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Collection = void 0;
 class Collection {
-    constructor(name, mangas) {
+    constructor(name, mangas, id) {
         this.name = name;
-        this.id = 'defaultid';
+        this.id = id;
         this.mangas = mangas;
         this.count = this.mangas.length;
     }

@@ -45,6 +45,7 @@ class Server {
         //CollectionDB API
         this.newCollection();
         this.listCollections();
+        this.deleteCollection();
         //Start listening on port
         this.listen();
     }
@@ -152,15 +153,14 @@ class Server {
         Start CollectionEngine API Endpoints
     */
     newCollection() {
-        this.app.get('/newcol/:colinfo', (req, res) => {
+        this.app.get('/collections/new/:colinfo', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'New Collection Requested');
             let newCollectionInfo = req.params.colinfo;
             let objectified = JSON.parse(newCollectionInfo); //Convert newColInfo String into Object;
             let collectionName = objectified.name;
             let collectionContents = objectified.mangas;
-            console.log(collectionContents);
             if (collectionContents.length == 0) {
-                res.status(200).send({ success: false, message: 'No mangas selected' });
+                res.status(406).send({ success: false, message: 'No mangas selected' });
                 return;
             }
             let result = this.cdb.newCollection(collectionName, collectionContents);
@@ -177,10 +177,18 @@ class Server {
         });
     }
     listCollections() {
-        this.app.get('/listcollections/', (req, res) => {
+        this.app.get('/collections/list', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'List Collections Requested');
             let list = this.cdb.collectionList;
             res.status(200).send(list);
+        });
+    }
+    deleteCollection() {
+        this.app.get('/collections/delete/:id', (req, res) => {
+            Logger_1.Logger.log(`DEBUG`, 'Delete collection requested.');
+            let id = req.params.id;
+            let result = this.cdb.delete(id);
+            res.status(200).send(result);
         });
     }
 } //END Server Class

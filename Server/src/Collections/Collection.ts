@@ -7,9 +7,9 @@ export class Collection implements CollectionInterface {
     public mangas: Array<CollectionMangaData>;
     public count: number;
     
-    constructor(name: string, mangas: Array<CollectionMangaData>) {
+    constructor(name: string, mangas: Array<CollectionMangaData>, id: string) {
         this.name = name;
-        this.id = 'defaultid';
+        this.id = id;
         this.mangas = mangas;
         this.count = this.mangas.length;
     }

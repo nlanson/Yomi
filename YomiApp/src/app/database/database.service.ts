@@ -78,27 +78,43 @@ export class DatabaseService {
     return res;
   }
 
-  async newCollection(name:string, mangasList: Array<MangaData>): Promise<HttpResponse<CommonAPIResult>> {
+  async newCollection(name:string, mangasList: Array<MangaData>): Promise<CommonAPIResult> {
     let requestObj = {
       name: name,
       mangas: mangasList
     }
 
-    let url = this.baseurl + "/newcol/" + JSON.stringify(requestObj);
-    let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+    let url = this.baseurl + "/collections/new/" + JSON.stringify(requestObj);
+    //let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
 
-    return res;
+    try {
+      var res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+    } catch (e) {
+      if (e.error) console.log(e.error.message);
+      return e.error;
+    }
+
+    return res.body;
   }
 
   async getCollections(): Promise<HttpResponse<any>> {
-    let url = this.baseurl + '/listcollections/';
+    let url = this.baseurl + '/collections/list/';
 
     let list: HttpResponse<any> = await this.http.get(url, {observe: 'response'}).toPromise();
     return list;
   }
 
-  async deleteCollection(id: number) {
-    //Delete a collection by ID or by collection name.
+  async deleteCollection(id: string): Promise<CommonAPIResult> {
+    //Delete a collection by ID.
+    let url = this.baseurl + `/collections/delete/${id}`
+    let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+
+    try {
+      let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
+    } catch (e) {
+      if (e.error) return e.error;
+    }
+    return res.body;
   }
 
 

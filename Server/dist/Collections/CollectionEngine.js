@@ -9,7 +9,6 @@ const Collection_1 = require("./Collection");
 class CollectionEngine {
     constructor(collectionpath, mdb) {
         this.coldb = [];
-        this.idCount = 1;
         this.collectionpath = collectionpath;
         this.mangadb = mdb;
     }
@@ -19,11 +18,13 @@ class CollectionEngine {
         //need to figure out how to setup file that will compile the docker image and still be dynamic and accessibile.
     }
     newCollection(name, mangas) {
-        let newCol = new Collection_1.Collection(name, mangas);
         //Makeshift ID System
         //In future, this should be replaced with some random alphanumerical string with a duplication check.
-        newCol.id = this.idCount.toString();
-        this.idCount++;
+        let id = '';
+        do {
+            id = Math.random().toString(36).slice(2);
+        } while (id.length == 0);
+        let newCol = new Collection_1.Collection(name, mangas, id);
         let titlesNotFound = [];
         for (let i = 0; i < mangas.length; i++) {
             let found = false;
@@ -62,6 +63,32 @@ class CollectionEngine {
     }
     get collectionList() {
         return this.coldb;
+    }
+    delete(id) {
+        let i = 0;
+        let found = false;
+        while (i < this.coldb.length && found == false) {
+            if (this.coldb[i].id == id) {
+                found = true;
+                this.removeCollectionFromDB(i);
+            }
+            i++;
+        }
+        if (found == true) {
+            return {
+                success: true,
+                message: 'Collection has been deleted.'
+            };
+        }
+        else {
+            return {
+                success: false,
+                message: 'Collection does not exist.'
+            };
+        }
+    }
+    removeCollectionFromDB(i) {
+        this.coldb.splice(i, 1);
     }
 }
 exports.CollectionEngine = CollectionEngine;

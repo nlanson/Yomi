@@ -97,15 +97,14 @@ export class CollectionFactoryComponent implements OnInit {
     //r.body will be CommonHandlerResult so .message will contain string message on success of failure reason and .success will indicate if successful or not.
     this.dialogRef.disableClose = false; //Enable component collapse again as the request is over.
 
-
     //Snackbar notifications + no manga selected error.
-    if (r.body.success)
+    if (r.success)
       this.openSnackBar("New Collection was Created Successfully!", "Awesome");
-    else if (r.body.message == 'No mangas selected') {
+    else if (r.message == 'No mangas selected') {
       this.FormError.nullManga = true;
       return;
     } else
-      this.openSnackBar(r.body.message, "Okay.");
+      this.openSnackBar(r.message, "Okay.");
 
 
 

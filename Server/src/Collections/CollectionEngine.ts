@@ -10,8 +10,15 @@ import { Collection } from './Collection'
 export class CollectionEngine {
     private collectionpath: string;
     public coldb: Array<Collection> = [];
+    /*
+        coldb Struct {
+            name: string,
+            id: string,
+            mangas: Array<CollectionMangaData>
+            count: number
+        }
+    */
     private mangadb: Database;
-    private idCount: number = 1;
 
     constructor(collectionpath: string, mdb: Database) {
         this.collectionpath = collectionpath;
@@ -26,12 +33,15 @@ export class CollectionEngine {
     }
     
     public newCollection(name: string, mangas: Array<CollectionMangaData>): CommonHandlerResult {
-        let newCol = new Collection(name, mangas);
-        
         //Makeshift ID System
         //In future, this should be replaced with some random alphanumerical string with a duplication check.
-        newCol.id = this.idCount.toString();
-        this.idCount++;
+        let id: string = '';
+        do {
+            id = Math.random().toString(36).slice(2);
+        } while (id.length == 0);
+        
+        
+        let newCol = new Collection(name, mangas, id);
         
         let titlesNotFound: Array<CollectionMangaData> = [];
         for ( let i=0; i<mangas.length; i++ ) {
@@ -74,6 +84,34 @@ export class CollectionEngine {
 
     public get collectionList() {
         return this.coldb
+    }
+
+    public delete(id: string): CommonHandlerResult {
+        let i: number = 0;
+        let found: boolean = false;
+        while ( i<this.coldb.length && found == false ) {
+            if ( this.coldb[i].id == id ) {
+                found = true;
+                this.removeCollectionFromDB(i);
+            }
+            i++
+        }
+        
+        if ( found == true ) {
+            return {
+                success: true,
+                message: 'Collection has been deleted.'
+            }
+        } else {
+            return {
+                success: false,
+                message: 'Collection does not exist.'
+            }
+        }
+    }
+
+    private removeCollectionFromDB(i: number) {
+        this.coldb.splice(i, 1);
     }
 
 
