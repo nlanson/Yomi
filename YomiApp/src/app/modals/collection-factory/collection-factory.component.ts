@@ -111,6 +111,8 @@ export class CollectionFactoryComponent implements OnInit {
           this.openSnackBar(r.message, "Okay.");
         this.dialogRef.disableClose = false;
     });
+
+    this.collectionForm.reset();
   }
 
   private openSnackBar(message: string, action: string) {
