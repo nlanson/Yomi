@@ -19,7 +19,7 @@ class YomiInitialiser {
             var mdb = new Database_1.Database(dbpath);
             yield mdb.setup();
             var cdb = new CollectionEngine_1.CollectionEngine('/data/collections.json', mdb);
-            yield cdb.setup();
+            yield cdb.setup(); //Does nothing atm.
             let server = new Server_1.Server(mdb, cdb); //Make collection data accessible through API, pass param here.
         });
     }
@@ -28,7 +28,7 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let prodPath = '/data/manga';
         let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
-        yield YomiInitialiser.run(devPath);
+        yield YomiInitialiser.run(prodPath);
     });
 }
 main();

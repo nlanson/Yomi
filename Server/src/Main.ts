@@ -9,7 +9,7 @@ class YomiInitialiser {
         await mdb.setup();
 
         var cdb: CollectionEngine = new CollectionEngine('/data/collections.json', mdb);
-        await cdb.setup();
+        await cdb.setup(); //Does nothing atm.
     
         let server = new Server(mdb, cdb); //Make collection data accessible through API, pass param here.
     }
@@ -21,7 +21,7 @@ async function main() {
     let prodPath = '/data/manga';
     let devPath = 'C:/Users/Nlanson/Desktop/Coding/Yomi/test/data/manga';
     
-    await YomiInitialiser.run(devPath);
+    await YomiInitialiser.run(prodPath);
 }
 
 main();

@@ -82,9 +82,9 @@ export class DatabaseService {
 
   /*
     Collection Functions
+      Functions here use the hot new Observable system.
   */
 
-    //Implemented fancy observable returning here. Use this as reference and restructure other functions.
     public newCollection(name:string, mangasList: Array<MangaData>): Observable<HttpResponse<CommonAPIResult>> {
     let requestObj = {
       name: name,
@@ -97,25 +97,18 @@ export class DatabaseService {
     return res;
   }
 
-  async getCollections(): Promise<HttpResponse<any>> {
+  getCollections(): Observable<HttpResponse<any>> {
     let url = this.baseurl + '/collections/list/';
 
-    let list: HttpResponse<any> = await this.http.get(url, {observe: 'response'}).toPromise();
-    return list;
+    return this.http.get(url, {observe: 'response'})
   }
 
-  async deleteCollection(id: string): Promise<CommonAPIResult> {
+  public deleteCollection(id: string): Observable<HttpResponse<CommonAPIResult>> {
     //Delete a collection by ID.
     let url = this.baseurl + `/collections/delete/${id}`
-    let res: HttpResponse<CommonAPIResult>;
+    let res: Observable<HttpResponse<CommonAPIResult>> = this.http.get<CommonAPIResult>(url, {observe: 'response'});
+    return res;
 
-    try {
-      res = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-    } catch (e) {
-      if (e.error)
-        return e.error;
-    }
-    return res.body;
   }
 
 

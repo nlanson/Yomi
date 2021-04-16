@@ -100,6 +100,7 @@ export class CollectionFactoryComponent implements OnInit {
         console.log(r);
         if (r.success)
           this.openSnackBar("New Collection was Created Successfully!", "Awesome");
+        this.dialogRef.disableClose = false;
       },
       err => {
         r = err.error;
@@ -108,6 +109,7 @@ export class CollectionFactoryComponent implements OnInit {
           this.FormError.nullManga = true;
         else // Other HTTP Errors
           this.openSnackBar(r.message, "Okay.");
+        this.dialogRef.disableClose = false;
     });
   }
 

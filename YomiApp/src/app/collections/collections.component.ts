@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router'
-import { DatabaseService } from '../database/database.service';
+import { Router } from '@angular/router';
+import { Observable, throwError } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 import { CollectionFactoryComponent } from '../modals/collection-factory/collection-factory.component';
 import { CommonAPIResult } from '../database/api.interfaces';
+import { DatabaseService } from '../database/database.service';
+
 
 @Component({
   selector: 'app-collections',
@@ -35,19 +38,21 @@ export class CollectionsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe( async () => {
       console.log('The Collection Factory was closed');
-      await this.getCollections();
+      this.getCollections();
     });
   }
 
   //Get the collection list from the database.
-  private async getCollections() {
-    var res = await this.db.getCollections();
-    if (res.status == 200) {
-      this.collections = res.body;
-    } else {
-      console.log(`List Status Code ${res.status}.`);
-      this.collections = [];
-    }
+  private getCollections() {
+    this.db.getCollections().subscribe(
+      data => {
+        this.collections = data.body;
+      },
+      err => {
+        console.log(`List failed to get \n Error: ${err.error}`)
+        this.collections = [];
+      }
+    );
   }
 
   //Open read page by title.
@@ -57,15 +62,22 @@ export class CollectionsComponent implements OnInit {
   }
 
   //Delete a collection by ID.
-  public async deleteCol(id: string) {
-    let res: CommonAPIResult = await this.db.deleteCollection(id);
-    if (res.success == true) {
-      await this.getCollections();
-      this.openSnackBar('Collection has been deleted', 'Great');
-    } else {
-      this.openSnackBar('Failed to delete', ':(');
-    }
-
+  public deleteCol(id: string) {
+    let r: CommonAPIResult;
+    this.db.deleteCollection(id).subscribe(
+      data => {
+        r = data.body;
+        if (r.success)
+          this.openSnackBar('Collection has been deleted', 'Great');
+        else
+        this.openSnackBar('Collection failed to delete', 'Damn.');
+      },
+      err => {
+        r = err.error;
+        if (!r.success)
+          this.openSnackBar(r.message, 'Damn.');
+      }
+    )
   }
 
 

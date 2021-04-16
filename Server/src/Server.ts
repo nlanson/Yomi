@@ -217,7 +217,10 @@ export class Server {
             let id:string = req.params.id
 
             let result: CommonHandlerResult = this.cdb.delete(id);
-            res.status(200).send(result);
+            if (result.success)
+                res.status(200).send(result);
+            else
+                res.status(406).send(result);
         });
     }
 

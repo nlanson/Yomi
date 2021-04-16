@@ -188,7 +188,10 @@ class Server {
             Logger_1.Logger.log(`DEBUG`, 'Delete collection requested.');
             let id = req.params.id;
             let result = this.cdb.delete(id);
-            res.status(200).send(result);
+            if (result.success)
+                res.status(200).send(result);
+            else
+                res.status(406).send(result);
         });
     }
 } //END Server Class
