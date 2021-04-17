@@ -22,42 +22,25 @@ export class DatabaseService {
     private http: HttpClient
   ) { console.log(this.baseurl) }
 
-  async getList(): Promise<HttpResponse<any>> {
+  getList(): Observable<HttpResponse<any>> {
     let url = this.baseurl + '/list';
-    let list: HttpResponse<any> = await this.http.get(url, {observe: 'response'}).toPromise();
-    return list;
+    return this.http.get(url, {observe: 'response'});
   }
 
-  async getManga(title): Promise<HttpResponse<CommonAPIResult>> {
+  getManga(title): Observable<HttpResponse<CommonAPIResult>> {
     let url = this.baseurl + `/manga/${title}`;
-    let manga: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-
-    return manga;
+    return this.http.get<CommonAPIResult>(url, {observe: 'response'});
   }
 
-  async getCoverImage(title): Promise<HttpResponse<CommonAPIResult>> {
-    let url = this.baseurl + `/manga/${title}`;
-    let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-
-    return res;
-  }
-
-  async refreshdb(): Promise<Boolean> {
+  refreshdb(): Observable<HttpResponse<CommonAPIResult>> {
     let url = this.baseurl + '/refresh'
-    let status: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-
-    if (status.status == 200)  { return true }
-    else { console.log('Refresh Failed'); return false }
+    return this.http.get<CommonAPIResult>(url, {observe: 'response'});
   }
 
-  async editManga(editObj): Promise<HttpResponse<CommonAPIResult>> {
+  editManga(editObj): Observable<HttpResponse<CommonAPIResult>> {
     let editString = JSON.stringify(editObj);
     let url = this.baseurl + '/editManga/' + editString;
-    let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-
-    //Might need error handling.
-
-    return res;
+    return this.http.get<CommonAPIResult>(url, {observe: 'response'});
   }
 
   upload(file: File): Observable<HttpEvent<CommonAPIResult>> {
@@ -71,13 +54,11 @@ export class DatabaseService {
     });
   }
 
-  async delete(title: string): Promise<HttpResponse<CommonAPIResult>> {
+  delete(title: string): Observable<HttpResponse<CommonAPIResult>> {
     let delobj = {title: title};
     let delString = JSON.stringify(delobj);
     let url = this.baseurl + '/deleteManga/' + delString;
-    let res: HttpResponse<CommonAPIResult> = await this.http.get<CommonAPIResult>(url, {observe: 'response'}).toPromise();
-
-    return res;
+    return this.http.get<CommonAPIResult>(url, {observe: 'response'});
   }
 
   /*
@@ -85,7 +66,7 @@ export class DatabaseService {
       Functions here use the hot new Observable system.
   */
 
-    public newCollection(name:string, mangasList: Array<MangaData>): Observable<HttpResponse<CommonAPIResult>> {
+  public newCollection(name:string, mangasList: Array<MangaData>): Observable<HttpResponse<CommonAPIResult>> {
     let requestObj = {
       name: name,
       mangas: mangasList

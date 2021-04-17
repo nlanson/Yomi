@@ -65,7 +65,7 @@ class Server {
             Logger_1.Logger.log('DEBUG', `Info for ${search} requested`);
             let qdb = this.db.searchByTitle(search);
             if (qdb.success) {
-                res.status(200).send(qdb.content);
+                res.status(200).send({ success: true, message: 'Manga was found', content: qdb.content });
             }
             else {
                 res.status(404).send({ success: false, message: 'Manga not found' });
@@ -85,8 +85,11 @@ class Server {
         this.app.get('/refresh', (req, res) => __awaiter(this, void 0, void 0, function* () {
             Logger_1.Logger.log('DEBUG', 'Refresh requested');
             let status = yield this.db.refresh(); //re inits the db.
-            if (status == true) {
-                res.status(200).send({ success: true, message: 'Refresed.' });
+            if (status) {
+                res.status(200).send({ success: true, message: 'Refreshed!' });
+            }
+            else {
+                res.status(500).send({ success: false, message: 'Refresh failed.' });
             }
         }));
     }

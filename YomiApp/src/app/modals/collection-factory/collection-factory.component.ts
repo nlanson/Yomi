@@ -14,12 +14,13 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class CollectionFactoryComponent implements OnInit {
 
+  private dataLoaded: Promise<boolean>;
   public mangaList: Array<MangaData>;
   public collectionForm: FormGroup;
   public FormError: any = {
     nullName: false,
     nullManga: false,
-  }
+  };
 
   constructor(
     private db: DatabaseService,
@@ -29,8 +30,31 @@ export class CollectionFactoryComponent implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    await this.getList();
+    this.getList(() =>{
+      this.loadForm();
+    });
+  }
 
+  getList(cb?:() => any) {
+    this.db.getList().subscribe(
+      data => {
+        console.log(data.body);
+        this.mangaList = data.body;
+        this.dataLoaded = Promise.resolve(true);
+        if (cb)
+          cb();
+      },
+      err => {
+        if ( err.error )
+          console.log(`Error loading list: ${err.error}`);
+
+        if (cb)
+          cb();
+      }
+    );
+  }
+
+  loadForm() {
     this.collectionForm = this.fb.group({
       name: [null, Validators.required],
       mangas: this.fb.array([]) //Init new form array
@@ -45,16 +69,6 @@ export class CollectionFactoryComponent implements OnInit {
         })
       );
     });
-  }
-
-  async getList() {
-    var res = await this.db.getList();
-    if (res.status == 200) {
-      this.mangaList = res.body;
-    } else {
-      console.log(`List Status Code ${res.status}.`);
-      this.mangaList = [];
-    }
   }
 
   //Return form array.
@@ -97,14 +111,12 @@ export class CollectionFactoryComponent implements OnInit {
     this.db.newCollection(newColData.name, newColData.mangas).subscribe(
       data => {
         r = data.body;
-        console.log(r);
         if (r.success)
           this.openSnackBar("New Collection was Created Successfully!", "Awesome");
         this.dialogRef.disableClose = false;
       },
       err => {
         r = err.error;
-        console.log(r);
         if (r.message == "No mangas selected")
           this.FormError.nullManga = true;
         else // Other HTTP Errors

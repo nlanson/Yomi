@@ -8,7 +8,7 @@ import { UploadMangaComponent } from '../modals/upload-manga/upload-manga.compon
 import {MatGridList} from '@angular/material/grid-list';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import { MangaData } from '../database/api.interfaces';
+import { CommonAPIResult, MangaData } from '../database/api.interfaces';
 
 
 
@@ -34,35 +34,23 @@ export class LibraryComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async getList() {
-    var res = await this.db.getList();
-    if (res.status == 200) {
-      this.list = res.body;
-    } else {
-      console.log(`List Status Code ${res.status}.`);
-      this.list = [];
-    }
+  getList(): void {
+    this.db.getList().subscribe(
+      data => {
+        this.list = data.body;
+      },
+      err => {
+        if (err.error) {
+          console.log(`Error retieving list ${err.status}`);
+          this.list = [];
+        }
+      }
+    );
   }
 
   read(title) {
     console.log(`read ${title}`);
     this.router.navigate(['read', title]);
-  }
-
-  getMangaCover(title) {
-    return new Promise(async (resolve) => {
-      let res = await this.db.getCoverImage(title);
-      let cover: string;
-      if ( res.status == 200 ) { //Need prod test
-        cover = res.body.content.pages[0];
-      } else if ( res.status == 411 ) {
-        console.log('Manga was not found... (Cover)');
-        cover = 'https://store.charteredaccountantsanz.com/sca-dev-kilimanjaro/img/no_image_available.jpeg' //Not avail jpg
-      }
-
-      console.log(`Cover for ${title} is at ${cover}`);
-      resolve(cover);
-    });
   }
 
   openEdit(mangaName): void {
@@ -73,7 +61,7 @@ export class LibraryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe( async () => {
       console.log('The Edit dialog was closed');
-      await this.getList();
+      this.getList();
     });
 
   }
@@ -85,7 +73,7 @@ export class LibraryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe( async () => {
       console.log('The Upload dialog was closed');
-      await this.getList();
+      this.getList();
     });
   }
 
@@ -93,11 +81,22 @@ export class LibraryComponent implements OnInit {
     console.log(title);
   }
 
-  async deleteManga(title) {
-    let res = await this.db.delete(title);
-    this.openSnackBar(`${title} has been deleted`, `Thanks`);
-
-    await this.getList();
+  deleteManga(title) {
+    let r: CommonAPIResult;
+    this.db.delete(title).subscribe(
+      data => {
+        r = data.body;
+        if ( r.success )
+          this.openSnackBar(`${title} has been deleted`, `Thanks`);
+        this.getList();
+      },
+      err => {
+        r = err.error;
+        console.log(err.status);
+        this.openSnackBar(`${r.message}`, `Noooo`);
+        this.getList();
+      }
+    );
   }
 
   openSnackBar(message: string, action: string) {

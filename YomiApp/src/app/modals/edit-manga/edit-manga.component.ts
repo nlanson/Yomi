@@ -5,6 +5,7 @@ import { DatabaseService } from '../../database/database.service';
 
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { CommonAPIResult } from 'src/app/database/api.interfaces';
 
 
 @Component({
@@ -38,20 +39,31 @@ export class EditMangaComponent implements OnInit {
       edit: this.editForm.value.edit
     };
 
-    let res = await this.db.editManga(editObj);
-
-    if ( res.status == 200 ) {
-      console.log('edit successful');
-      this.openSnackBar('Edit Successful', 'Great!');
-    } else if ( res.status > 400 && res.status < 500 ) {
-      console.log(`edit was invalid`);
-      this.openSnackBar('Edit Failed Miserably (Invalid)', 'RIP');
-    } else if ( res.status > 500 ) {
-      console.log('edit request was valid but rename failed.');
-      this.openSnackBar('Edit Failed. Have another shot at it.', 'Ok!');
-    }
-
-    this.dialogRef.close();
+    let r: CommonAPIResult;
+    this.db.editManga(editObj).subscribe(
+      data => {
+        r = data.body;
+        if ( r.success ) {
+          console.log('edit successful');
+          this.openSnackBar('Edit Successful', 'Great!');
+        }
+        this.dialogRef.close();
+      },
+      err => {
+        r = err.error;
+        if ( err.status > 400 && err.status < 500 ) {
+          console.log(`edit was invalid`);
+          this.openSnackBar('Edit Failed Miserably (Invalid)', 'RIP');
+        } else if  ( err.status > 500 ) {
+          console.log('edit request was valid but rename failed.');
+          this.openSnackBar('Edit Failed. Have another shot at it.', 'Ok!');
+        } else {
+          console.log(`EDIT ERROR: {UNKNOWN}`);
+          this.openSnackBar('Edit Failed for Unknown Reasons', 'WTF');
+        }
+        this.dialogRef.close();
+      }
+    );
   }
 
   openSnackBar(message: string, action: string) {

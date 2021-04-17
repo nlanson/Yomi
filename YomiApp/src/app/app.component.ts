@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav'
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { CommonAPIResult } from './database/api.interfaces';
 
 import { DatabaseService } from './database/database.service';
 import { LibraryComponent } from './library/library.component';
@@ -23,13 +24,21 @@ export class AppComponent {
 
 
   async refreshdb() {
-    let refreshed = await this.db.refreshdb();
-
-    if (refreshed) {
-      this.openSnackBar('Refreshed!', 'Ok');
-      await this.libc.getList();
-    }
-    else this.openSnackBar('Epic Refresh Failure!', 'LOL');
+    let r: CommonAPIResult;
+    this.db.refreshdb().subscribe(
+      data =>{
+        r = data.body;
+        if ( r.success ) {
+          this.openSnackBar(r.message, 'Ok');
+          this.libc.getList();
+        }
+      },
+      err => {
+        let r = err.error;
+        console.log(err.error.message);
+        this.openSnackBar('Epic Refresh Failure!', 'LOL');
+      }
+    );
   }
 
   openSnackBar(message: string, action: string) {

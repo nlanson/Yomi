@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, UrlHandlingStrategy } from '@angular/router';
+import { CommonAPIResult } from '../database/api.interfaces';
 
 import { DatabaseService } from '../database/database.service';
 
@@ -26,19 +27,27 @@ export class ReadComponent implements OnInit {
       this.title = params["title"];
     });
 
-    console.log(this.title);
-    let res = await this.db.getManga(this.title);
-
-    if ( res.status == 200 ) {
-      console.log(res.body);
-      this.manga = res.body;
-      this.preloadImages();
-    } else if ( res.status == 411 ) {
-      console.log(`${this.title} was not found in the database.`);
-      this.manga = undefined;
-    } else {
-      console.log(`Error (Unknown)`)
-    }
+    let r: CommonAPIResult;
+    this.db.getManga(this.title).subscribe(
+      data => {
+        r = data.body;
+        if (r.success) {
+          this.manga = r.content;
+          this.preloadImages();
+          console.log(this.manga)
+        }
+      },
+      err => {
+        r = err.error;
+        this.manga = undefined;
+        if (err.status == 411) {
+          console.log(`${this.title} was not found in the database.`);
+        } else {
+          console.log(r);
+          console.log(`Error (Unknown)`)
+        }
+      }
+    );
   }
 
   minus() {
