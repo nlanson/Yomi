@@ -1,29 +1,43 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CollectionEngine = void 0;
 /*Collection Engine
     Where the collections database is located and methods to create and remove collections.
 */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CollectionEngine = void 0;
+const fs_1 = __importDefault(require("fs"));
 const Logger_1 = require("../Common/Logger");
 const Collection_1 = require("./Collection");
 class CollectionEngine {
-    constructor(collectionpath, mdb) {
-        this.coldb = [];
+    constructor(collectionpath, mangadb) {
         this.collectionpath = collectionpath;
-        this.mangadb = mdb;
+        this.mangadb = mangadb;
+        //Declarations
+        this.coldb = [];
+        this.coljson = require(this.collectionpath);
     }
     setup() {
-        //input data from a json file containing previously created collection data into coldb.
-        //iterate over input file and validate each collection. Check if every manga entry in the collection exists in the mangadb and remove if not.
-        //need to figure out how to setup file that will compile the docker image and still be dynamic and accessibile.
+        //Synchronise JSON contents with ColDB.
+        //Should perform checks here to make sure each entry in the JSON is valid.
+        this.coldb = this.coljson.save_data;
+        Logger_1.Logger.log(`INFO`, `Collection Engine Ignited`);
+    }
+    saveData() {
+        let sd = {
+            save_data: this.coldb
+        };
+        fs_1.default.writeFileSync(this.collectionpath, JSON.stringify(sd, null, 2));
     }
     newCollection(name, mangas) {
-        //Makeshift ID System
-        //In future, this should be replaced with some random alphanumerical string with a duplication check.
+        //ID System
+        //Maybe implement duplication check.
         let id = '';
         do {
             id = Math.random().toString(36).slice(2);
         } while (id.length == 0);
+        //Create new collection in var newCol.
         let newCol = new Collection_1.Collection(name, mangas, id);
         let titlesNotFound = [];
         for (let i = 0; i < mangas.length; i++) {
@@ -43,6 +57,7 @@ class CollectionEngine {
         if (titlesNotFound.length == 0) {
             Logger_1.Logger.log(`INFO`, `New collection successfully created.`);
             this.coldb.push(newCol); //Push new colelction to the Collection DB.
+            this.saveData();
             return {
                 success: true,
                 message: "New Collection Successfully created"
@@ -56,10 +71,6 @@ class CollectionEngine {
                 content: JSON.stringify(titlesNotFound)
             };
         }
-        /* Validate collection entries here.
-            - Match each manga entry in the new collection to mangas in the Database.
-            - If manga validation fails, dont push new collection to the db and return a failure message.
-        */
     }
     get collectionList() {
         return this.coldb;

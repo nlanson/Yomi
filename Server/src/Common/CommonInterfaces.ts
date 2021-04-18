@@ -1,3 +1,5 @@
+import { Collection } from "../Collections/Collection";
+
 export interface CommonHandlerResult {
     success: Boolean,
     message: string,
@@ -15,4 +17,8 @@ export interface CollectionInterface {
 
 export interface CollectionMangaData {
     title: string;
+}
+
+export interface CollectionSaveFile {
+    save_data: Array<Collection>
 }

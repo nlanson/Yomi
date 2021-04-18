@@ -34,7 +34,6 @@ export class ReadComponent implements OnInit {
         if (r.success) {
           this.manga = r.content;
           this.preloadImages();
-          console.log(this.manga)
         }
       },
       err => {

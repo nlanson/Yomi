@@ -1,3 +1,17 @@
 {
-    "collections": []
+  "save_data": [
+    {
+      "name": "aaaa",
+      "id": "p2swywoec4j",
+      "mangas": [
+        {
+          "title": "HJ 1"
+        },
+        {
+          "title": "haha"
+        }
+      ],
+      "count": 2
+    }
+  ]
 }

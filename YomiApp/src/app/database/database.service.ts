@@ -27,7 +27,7 @@ export class DatabaseService {
     return this.http.get(url, {observe: 'response'});
   }
 
-  getManga(title): Observable<HttpResponse<CommonAPIResult>> {
+  getManga(title: string): Observable<HttpResponse<CommonAPIResult>> {
     let url = this.baseurl + `/manga/${title}`;
     return this.http.get<CommonAPIResult>(url, {observe: 'response'});
   }
