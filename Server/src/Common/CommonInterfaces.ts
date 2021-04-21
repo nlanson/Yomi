@@ -1,9 +1,11 @@
 import { Collection } from "../Collections/Collection";
 
+export type Status = 'success' | 'failure' | 'error';
+
 export interface CommonHandlerResult {
-    success: Boolean,
-    message: string,
-    content?: any
+    status: Status,
+    data?: any,
+    message: string
 }
 
 export interface CollectionInterface {

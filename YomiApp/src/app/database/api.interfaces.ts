@@ -5,8 +5,10 @@ export interface MangaData {
   cover: string;
 }
 
+export type Status = 'success' | 'failure' | 'error';
+
 export interface CommonAPIResult { //== CommonHandlerResult in Backend.
-  success: boolean;
+  status: Status;
   message: string;
-  content?: any; //If it exists it could be any type. String, Object or null.
+  data?: any; //If it exists it could be any type. String, Object or null.
 }

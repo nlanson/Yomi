@@ -72,21 +72,22 @@ export class Server {
             Logger.log('DEBUG', `Info for ${search} requested`);
 
             let qdb: CommonHandlerResult = this.db.searchByTitle(search);
-            if ( qdb.success ) {
-                res.status(200).send({success: true, message: 'Manga was found', content: qdb.content});
+            if ( qdb.status == 'success' ) {
+                res.status(200).send(qdb);
             } else {
-                res.status(404).send({success: false, message: 'Manga not found'});
+                res.status(400).send(qdb);
                 Logger.log("ERROR", "Manga not found in search");
             }
         });
     }
 
+    //NO JSEND STANDARD
     private listdb(): void { //List the DB to api request /list.
                // Can be used to list all manga in the DB to click and open.
         this.app.get('/list', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'List requested')
             let list: CommonHandlerResult = this.db.list();
-            res.status(200).send(list.content);
+            res.status(200).send(list.data);
         });
     }
 
@@ -96,9 +97,9 @@ export class Server {
             let status: boolean = await this.db.refresh(); //re inits the db.
 
             if ( status ) {
-                res.status(200).send({success: true, message: 'Refreshed!'});
+                res.status(200).send({status: 'success', message: 'Refreshed!'});
             } else {
-                res.status(500).send({success: false, message: 'Refresh failed.'});
+                res.status(500).send({status: 'error', message: 'Refresh failed.'});
             }
         })
     }
@@ -118,17 +119,17 @@ export class Server {
 
             let qdb: CommonHandlerResult = await this.db.editMangaName(ogName, newName);
 
-            if ( qdb.success ) {
-                res.status(200).send({success: qdb.success, message: qdb.message}); // Full success
+            if ( qdb.status == 'success' ) {
+                res.status(200).send(qdb); // Full success
             } else {
-                res.status(500).send({success: qdb.success, message: qdb.message}); //Partial success. Manga was valid but rename failed.
+                res.status(500).send(qdb); //Partial success. Manga was valid but rename failed.
             }
         });
     }
 
     private async upload(): Promise<void> {
         this.app.get('/upload', (req: any, res: any) => {
-            res.status(405)({status: 'failed', message: `You've requested this the wrong way.`})
+            res.status(400)({status: 'failed', message: `You've requested this the wrong way.`})
         })
         
         this.app.post('/upload', async (req: any, res: any) => {
@@ -137,14 +138,14 @@ export class Server {
                 let file = req.files.file;
 
                 let qdb: CommonHandlerResult = await this.db.upload(file);
-                if ( qdb.success ) {
+                if ( qdb.status == 'success' ) {
                     Logger.log(`DEBUG`, `Upload Successful!`);
-                    res.status(200).send({success: qdb.success, message: qdb.message});
+                    res.status(200).send(qdb);
                 } else {
                     Logger.log(`ERROR`, `Upload Failed: ${qdb.message}`);
-                    res.status(500).send({success: qdb.success, message: qdb.message});
+                    res.status(500).send(qdb);
                 }
-            } else res.status(400).send({success: false, message: "No file received."});
+            } else res.status(400).send({status: 'error', message: "No file received."});
         });
     }
 
@@ -161,10 +162,10 @@ export class Server {
 
             let qdb: CommonHandlerResult = await this.db.deleteManga(del);
 
-            if ( qdb.success ) {
-                res.status(200).send({success: true, message: `${del} was deleted.`});
+            if ( qdb.status == 'success' ) {
+                res.status(200).send({status: 'success', message: `${del} was deleted.`});
             } else {
-                res.status(500).send({success: false, message: 'Failed to delete. Check logs'});
+                res.status(500).send({status: 'failure', message: 'Failed to delete. Check logs'});
             }
         });
     }
@@ -188,21 +189,22 @@ export class Server {
             let collectionContents: Array<CollectionMangaData> = objectified.mangas;
             
             if (collectionContents.length == 0) {
-                res.status(406).send({success: false, message: 'No mangas selected'});
+                res.status(400).send({success: false, message: 'No mangas selected'});
                 return;
             }
 
             let result: CommonHandlerResult = this.cdb.newCollection(collectionName, collectionContents);
-            if ( result.success ) res.status(200).send(result); //Success
+            if ( result.status == 'success' ) res.status(200).send(result); //Success
             else {// On collection creation error
                 //Send back with content
-                if (result.content) res.status(500).send({success: result.success, message: result.message, content: result.content});
+                if (result.data) res.status(500).send(result);
                 //Send back without content
-                else res.status(500).send({success: result.success, message: result.message});
+                else res.status(500).send(result);
             }
         });
     }
 
+    //NO JSEND STANDARD
     private listCollections() {
         this.app.get('/collections/list', (req: any, res: any) => {
             Logger.log(`DEBUG`, 'List Collections Requested');
@@ -219,10 +221,10 @@ export class Server {
             let id:string = req.params.id
 
             let result: CommonHandlerResult = this.cdb.delete(id);
-            if (result.success)
+            if (result.status == 'success')
                 res.status(200).send(result);
             else
-                res.status(406).send(result);
+                res.status(400).send(result);
         });
     }
 

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { DatabaseService } from '../../database/database.service';
+import { CommonAPIResult } from '../../database/api.interfaces';
+
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { MatDialogRef } from '@angular/material/dialog';
 
@@ -46,8 +48,8 @@ export class UploadMangaComponent implements OnInit {
           this.progress = Math.round(100 * event.loaded / event.total);
         } else if ( event instanceof HttpResponse ) {
           //This is the HTTP Response sent from the server.
-          let resp = event.body
-          let success = resp.success;
+          let resp: CommonAPIResult = event.body
+          let status = resp.status;
           this.message = resp.message //This is the HTTP Response sent from the server.
           this.uploading = false;
 

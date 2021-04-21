@@ -22,7 +22,7 @@ class CollectionEngine {
         //Synchronise JSON contents with ColDB.
         //Should perform checks here to make sure each entry in the JSON is valid.
         this.coldb = this.coljson.save_data;
-        Logger_1.Logger.log(`INFO`, `Collection Engine Ignited`);
+        Logger_1.Logger.log(`DEBUG`, `Collection Engine Ignited`);
     }
     saveData() {
         let sd = {
@@ -59,16 +59,16 @@ class CollectionEngine {
             this.coldb.push(newCol); //Push new colelction to the Collection DB.
             this.saveData();
             return {
-                success: true,
+                status: 'success',
                 message: "New Collection Successfully created"
             };
         }
         else {
             Logger_1.Logger.log(`ERROR`, `New collection was not created as invalid manga was detected.`);
             return {
-                success: false,
+                status: "failure",
                 message: "Invalid manga contained in request.",
-                content: JSON.stringify(titlesNotFound)
+                data: JSON.stringify(titlesNotFound)
             };
         }
     }
@@ -87,19 +87,20 @@ class CollectionEngine {
         }
         if (found == true) {
             return {
-                success: true,
+                status: 'success',
                 message: 'Collection has been deleted.'
             };
         }
         else {
             return {
-                success: false,
+                status: 'failure',
                 message: 'Collection does not exist.'
             };
         }
     }
     removeCollectionFromDB(i) {
         this.coldb.splice(i, 1);
+        this.saveData();
     }
 }
 exports.CollectionEngine = CollectionEngine;

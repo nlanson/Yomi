@@ -180,25 +180,23 @@ class Database {
             if (this.mangadb[i].title == title) {
                 found = true;
                 return {
-                    success: true,
+                    status: 'success',
                     message: "Found",
-                    content: this.mangadb[i]
+                    data: this.mangadb[i]
                 };
             }
             i++;
         }
         if (found == false) {
             return {
-                success: false,
-                message: "Manga not found.",
-                content: null
+                status: 'failure',
+                message: "Manga not found."
             };
         }
         else { //fallback
             return {
-                success: false,
-                message: "Error",
-                content: null
+                status: 'error',
+                message: "Error"
             };
         }
     }
@@ -211,7 +209,7 @@ class Database {
             })(this.mangadb[manga]); // Remove pages property from mangadb entries and push into list.
             list.push(listEntry);
         }
-        return { success: true, message: 'list compiled', content: list };
+        return { status: 'success', message: 'list compiled', data: list };
     }
     upload(file) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -223,9 +221,8 @@ class Database {
             catch (e) {
                 Logger_1.Logger.log(`ERROR`, 'Failed receiving the file upload.');
                 dbresponse = {
-                    success: false,
-                    message: "Failed at receiving file upload",
-                    content: null
+                    status: 'failure',
+                    message: "Failed at receiving file upload"
                 };
                 return dbresponse;
             }
@@ -233,28 +230,25 @@ class Database {
             let archive = this.dbpath + '/' + filename;
             let uh = new UploadHandler_1.UploadHandler(archive, this);
             let result = yield uh.handle();
-            switch (result.success) {
-                case (true):
+            switch (result.status) {
+                case ('success'):
                     dbresponse = {
-                        success: true,
-                        message: 'Upload successful',
-                        content: null
+                        status: 'success',
+                        message: 'Upload successful'
                     };
                     this.refresh();
                     return dbresponse;
-                case (false):
+                case ('error'):
                     dbresponse = {
-                        success: false,
-                        message: 'Upload unsuccessful',
-                        content: null
+                        status: 'error',
+                        message: result.message
                     };
                     return dbresponse;
                 default:
                     Logger_1.Logger.log('ERROR', 'Handler failed to instantiate.');
                     dbresponse = {
-                        success: false,
-                        message: "Handler failed to instantiate",
-                        content: null
+                        status: 'failure',
+                        message: "Handler failed to instantiate"
                     };
                     return dbresponse;
             }
@@ -278,14 +272,14 @@ class Database {
                         flag = false;
                         Logger_1.Logger.log(`ERROR`, 'Edit Failed');
                         message = "Rename failed. Manga exists but FS failed.";
-                        return { success: false, message: message, content: null }; //Rename failed. Manga exists but FS failed.
+                        return { status: 'error', message: message }; //Rename failed. Manga exists but FS failed.
                     }
                     //If rename is successful, code will enter this condition.
                     if (flag) {
                         Logger_1.Logger.log(`DEBUG`, `Successfully Edited ${o} -> ${n}`);
                         message = 'Edit Success';
                         this.refresh(); //Refresh DB
-                        return { success: true, message: message, content: null }; // Full success
+                        return { status: 'success', message: message }; // Full success
                     }
                 }
                 i++;
@@ -294,9 +288,8 @@ class Database {
             Logger_1.Logger.log(`ERROR`, 'Edit request manga not found.');
             message = 'Manga not found';
             let response = {
-                success: false,
-                message: 'Manga not found',
-                content: null
+                status: 'failure',
+                message: 'Manga not found'
             };
             return response;
         });
@@ -314,18 +307,16 @@ class Database {
                     this.mangadb.splice(i, 1); //Remove deleted entry from DB
                     Logger_1.Logger.log('DEBUG', `${title} was deleted`);
                     let response = {
-                        success: true,
-                        message: `Successfully Deleted`,
-                        content: null
+                        status: 'success',
+                        message: `Successfully Deleted`
                     };
                     return response;
                 }
             }
             Logger_1.Logger.log('ERROR', 'Manga to delete not found');
             let response = {
-                success: false,
-                message: `Manga not found`,
-                content: null
+                status: 'failure',
+                message: `Manga not found`
             };
             return response;
         });

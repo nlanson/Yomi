@@ -86,7 +86,7 @@ export class LibraryComponent implements OnInit {
     this.db.delete(title).subscribe(
       data => {
         r = data.body;
-        if ( r.success )
+        if ( r.status == 'success' )
           this.openSnackBar(`${title} has been deleted`, `Thanks`);
         this.getList();
       },

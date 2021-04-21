@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
-import { MangaData } from 'src/app/database/api.interfaces';
+import { MangaData, CommonAPIResult } from 'src/app/database/api.interfaces';
 import { DatabaseService } from '../../database/database.service';
 
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -92,6 +92,7 @@ export class CollectionFactoryComponent implements OnInit {
     //Check if collection name field is empty.
     if ( newColData.name == null || newColData.name == '' ) {
       this.FormError.nullName = true;
+      this.dialogRef.disableClose = false;
       return;
     }
 
@@ -111,7 +112,7 @@ export class CollectionFactoryComponent implements OnInit {
     this.db.newCollection(newColData.name, newColData.mangas).subscribe(
       data => {
         r = data.body;
-        if (r.success)
+        if (r.status == 'success')
           this.openSnackBar("New Collection was Created Successfully!", "Awesome");
         this.dialogRef.disableClose = false;
       },

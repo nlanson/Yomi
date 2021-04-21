@@ -64,21 +64,22 @@ class Server {
             let search = req.params.title;
             Logger_1.Logger.log('DEBUG', `Info for ${search} requested`);
             let qdb = this.db.searchByTitle(search);
-            if (qdb.success) {
-                res.status(200).send({ success: true, message: 'Manga was found', content: qdb.content });
+            if (qdb.status == 'success') {
+                res.status(200).send(qdb);
             }
             else {
-                res.status(404).send({ success: false, message: 'Manga not found' });
+                res.status(400).send(qdb);
                 Logger_1.Logger.log("ERROR", "Manga not found in search");
             }
         });
     }
+    //NO JSEND STANDARD
     listdb() {
         // Can be used to list all manga in the DB to click and open.
         this.app.get('/list', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'List requested');
             let list = this.db.list();
-            res.status(200).send(list.content);
+            res.status(200).send(list.data);
         });
     }
     refreshdb() {
@@ -86,10 +87,10 @@ class Server {
             Logger_1.Logger.log('DEBUG', 'Refresh requested');
             let status = yield this.db.refresh(); //re inits the db.
             if (status) {
-                res.status(200).send({ success: true, message: 'Refreshed!' });
+                res.status(200).send({ status: 'success', message: 'Refreshed!' });
             }
             else {
-                res.status(500).send({ success: false, message: 'Refresh failed.' });
+                res.status(500).send({ status: 'error', message: 'Refresh failed.' });
             }
         }));
     }
@@ -102,11 +103,11 @@ class Server {
                 let ogName = objectified.title;
                 let newName = objectified.edit;
                 let qdb = yield this.db.editMangaName(ogName, newName);
-                if (qdb.success) {
-                    res.status(200).send({ success: qdb.success, message: qdb.message }); // Full success
+                if (qdb.status == 'success') {
+                    res.status(200).send(qdb); // Full success
                 }
                 else {
-                    res.status(500).send({ success: qdb.success, message: qdb.message }); //Partial success. Manga was valid but rename failed.
+                    res.status(500).send(qdb); //Partial success. Manga was valid but rename failed.
                 }
             }));
         });
@@ -114,24 +115,24 @@ class Server {
     upload() {
         return __awaiter(this, void 0, void 0, function* () {
             this.app.get('/upload', (req, res) => {
-                res.status(405)({ status: 'failed', message: `You've requested this the wrong way.` });
+                res.status(400)({ status: 'failed', message: `You've requested this the wrong way.` });
             });
             this.app.post('/upload', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 if (req.files) {
                     Logger_1.Logger.log('DEBUG', 'Receiving upload');
                     let file = req.files.file;
                     let qdb = yield this.db.upload(file);
-                    if (qdb.success) {
+                    if (qdb.status == 'success') {
                         Logger_1.Logger.log(`DEBUG`, `Upload Successful!`);
-                        res.status(200).send({ success: qdb.success, message: qdb.message });
+                        res.status(200).send(qdb);
                     }
                     else {
                         Logger_1.Logger.log(`ERROR`, `Upload Failed: ${qdb.message}`);
-                        res.status(500).send({ success: qdb.success, message: qdb.message });
+                        res.status(500).send(qdb);
                     }
                 }
                 else
-                    res.status(400).send({ success: false, message: "No file received." });
+                    res.status(400).send({ status: 'error', message: "No file received." });
             }));
         });
     }
@@ -143,11 +144,11 @@ class Server {
                 let objectified = JSON.parse(del);
                 del = objectified.title;
                 let qdb = yield this.db.deleteManga(del);
-                if (qdb.success) {
-                    res.status(200).send({ success: true, message: `${del} was deleted.` });
+                if (qdb.status == 'success') {
+                    res.status(200).send({ status: 'success', message: `${del} was deleted.` });
                 }
                 else {
-                    res.status(500).send({ success: false, message: 'Failed to delete. Check logs' });
+                    res.status(500).send({ status: 'failure', message: 'Failed to delete. Check logs' });
                 }
             }));
         });
@@ -163,22 +164,23 @@ class Server {
             let collectionName = objectified.name;
             let collectionContents = objectified.mangas;
             if (collectionContents.length == 0) {
-                res.status(406).send({ success: false, message: 'No mangas selected' });
+                res.status(400).send({ success: false, message: 'No mangas selected' });
                 return;
             }
             let result = this.cdb.newCollection(collectionName, collectionContents);
-            if (result.success)
+            if (result.status == 'success')
                 res.status(200).send(result); //Success
             else { // On collection creation error
                 //Send back with content
-                if (result.content)
-                    res.status(500).send({ success: result.success, message: result.message, content: result.content });
+                if (result.data)
+                    res.status(500).send(result);
                 //Send back without content
                 else
-                    res.status(500).send({ success: result.success, message: result.message });
+                    res.status(500).send(result);
             }
         });
     }
+    //NO JSEND STANDARD
     listCollections() {
         this.app.get('/collections/list', (req, res) => {
             Logger_1.Logger.log(`DEBUG`, 'List Collections Requested');
@@ -191,10 +193,10 @@ class Server {
             Logger_1.Logger.log(`DEBUG`, 'Delete collection requested.');
             let id = req.params.id;
             let result = this.cdb.delete(id);
-            if (result.success)
+            if (result.status == 'success')
                 res.status(200).send(result);
             else
-                res.status(406).send(result);
+                res.status(400).send(result);
         });
     }
 } //END Server Class

@@ -31,8 +31,8 @@ export class ReadComponent implements OnInit {
     this.db.getManga(this.title).subscribe(
       data => {
         r = data.body;
-        if (r.success) {
-          this.manga = r.content;
+        if (r.status == 'success') {
+          this.manga = r.data;
           this.preloadImages();
         }
       },

@@ -37,7 +37,7 @@ class UploadHandler {
     //Method to call.
     handle() {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = { success: false, message: 'unhandled.' };
+            let response = { status: 'error', message: 'unhandled.' };
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 try {
                     yield this.unarchive();
@@ -88,7 +88,7 @@ class UploadHandler {
                     response.message = 'No valid files were in the archive.';
                     resolve(response);
                 }
-                response.success = true;
+                response.status = 'success';
                 response.message = 'Uploaded and Unpacked';
                 resolve(response);
             }));
@@ -101,7 +101,7 @@ class UploadHandler {
     unarchive() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                let result = { success: false, message: 'unarchiver failure' };
+                let result = { status: 'error', message: 'unarchiver failure' };
                 switch (this.filetype) {
                     case ('.zip'):
                         result = yield this.unzip();
@@ -119,8 +119,7 @@ class UploadHandler {
                 const zip = yield fs_1.default.createReadStream(this.file) //Extract ZIP to /temp/ folder.
                     .pipe(unzipper.Extract({ path: this.temp }))
                     .on('close', () => __awaiter(this, void 0, void 0, function* () {
-                    let result = { success: true, message: 'Unzipped.' };
-                    resolve(result);
+                    resolve({ status: 'success', message: 'Unzipped.' });
                 }))
                     .on('error', () => __awaiter(this, void 0, void 0, function* () {
                     reject(new Error('Unzipping read stream gave an error.'));
@@ -178,7 +177,7 @@ class UploadHandler {
                     }
                     finally { if (e_1) throw e_1.error; }
                 }
-                resolve({ success: true, message: 'Temp scanned' });
+                resolve({ status: 'success', message: 'Temp scanned' });
             }));
         });
     }
@@ -219,7 +218,7 @@ class UploadHandler {
                         continue;
                     }
                 }
-                let response = { success: true, message: 'Pages Validated' };
+                let response = { status: 'success', message: 'Pages Validated' };
                 resolve(response);
             }));
         });

@@ -67,15 +67,17 @@ export class CollectionsComponent implements OnInit {
     this.db.deleteCollection(id).subscribe(
       data => {
         r = data.body;
-        if (r.success)
+        if (r.status == 'success')
           this.openSnackBar('Collection has been deleted', 'Great');
         else
         this.openSnackBar('Collection failed to delete', 'Damn.');
       },
       err => {
         r = err.error;
-        if (!r.success)
+        if (r.status != 'success')
           this.openSnackBar(r.message, 'Damn.');
+        else
+          console.log(`err caught but status was declared as ${r.status}`)
       }
     )
   }

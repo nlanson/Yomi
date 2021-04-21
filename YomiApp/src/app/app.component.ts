@@ -28,7 +28,7 @@ export class AppComponent {
     this.db.refreshdb().subscribe(
       data =>{
         r = data.body;
-        if ( r.success ) {
+        if ( r.status == 'success' ) {
           this.openSnackBar(r.message, 'Ok');
           this.libc.getList();
         }

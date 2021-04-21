@@ -6,7 +6,7 @@ const unzipper = require('unzipper');
 
 //Internal
 import { Database } from './Database'
-import { CommonHandlerResult } from './Common/CommonInterfaces';
+import { CommonHandlerResult, Status } from './Common/CommonInterfaces';
 import { Logger } from './Common/Logger';
 
 
@@ -30,7 +30,7 @@ export class UploadHandler {
 
     //Method to call.
     public async handle(): Promise<CommonHandlerResult> {
-        let response: CommonHandlerResult = {success: false, message: 'unhandled.'}
+        let response: CommonHandlerResult = {status: 'error', message: 'unhandled.'}
         return new Promise(async (resolve, reject) => {
             try {
                 await this.unarchive();
@@ -81,7 +81,7 @@ export class UploadHandler {
                 resolve(response);
             }
 
-            response.success = true;
+            response.status = 'success';
             response.message = 'Uploaded and Unpacked';
             resolve(response);
 
@@ -95,7 +95,7 @@ export class UploadHandler {
 
     private async unarchive(): Promise<CommonHandlerResult> {
         return new Promise( async (resolve, reject) => {
-            let result: CommonHandlerResult = { success: false, message: 'unarchiver failure'}
+            let result: CommonHandlerResult = { status: 'error', message: 'unarchiver failure'}
             switch ( this.filetype ) {
                 case('.zip'):
                     result = await this.unzip();
@@ -112,8 +112,7 @@ export class UploadHandler {
             const zip = await fs.createReadStream(this.file) //Extract ZIP to /temp/ folder.
                 .pipe(unzipper.Extract({ path: this.temp }))
                 .on('close', async () => {
-                    let result = { success: true, message: 'Unzipped.'}
-                    resolve(result);
+                    resolve({ status: 'success', message: 'Unzipped.'});
                 })
                 .on('error', async () => {
                     reject(new Error('Unzipping read stream gave an error.'))
@@ -156,7 +155,7 @@ export class UploadHandler {
                     });
                 }
             }
-            resolve({success: true, message: 'Temp scanned'});
+            resolve({status: 'success', message: 'Temp scanned'});
         });
     }
 
@@ -197,7 +196,7 @@ export class UploadHandler {
                     continue
                 }
             }
-            let response = { success: true, message: 'Pages Validated' }
+            let response:CommonHandlerResult = { status: 'success', message: 'Pages Validated' }
             resolve(response)
         })
     }

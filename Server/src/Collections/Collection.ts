@@ -28,9 +28,9 @@ export class Collection implements CollectionInterface {
         }
 
         if ( found == true ) { 
-            return {success: true, message: 'Manga not found'}
+            return {status: 'success', message: 'Manga not found'}
         } else {
-            return {success: false, message: 'Manga not found'}
+            return {status: 'failure', message: 'Manga not found'}
         }
     }
 

@@ -27,7 +27,7 @@ export class CollectionEngine {
         //Should perform checks here to make sure each entry in the JSON is valid.
         this.coldb = this.coljson.save_data;
         
-        Logger.log(`INFO`, `Collection Engine Ignited`);
+        Logger.log(`DEBUG`, `Collection Engine Ignited`);
     }
 
     private saveData() {
@@ -72,15 +72,15 @@ export class CollectionEngine {
             this.coldb.push(newCol); //Push new colelction to the Collection DB.
             this.saveData();
             return { //Return success.
-                success: true,
+                status: 'success',
                 message: "New Collection Successfully created"
             };
         } else {
             Logger.log(`ERROR`, `New collection was not created as invalid manga was detected.`);
             return { //Return failure.
-                success: false,
+                status: "failure",
                 message: "Invalid manga contained in request.",
-                content: JSON.stringify(titlesNotFound)
+                data: JSON.stringify(titlesNotFound)
             };
         }
     }
@@ -102,12 +102,12 @@ export class CollectionEngine {
         
         if ( found == true ) {
             return {
-                success: true,
+                status: 'success',
                 message: 'Collection has been deleted.'
             }
         } else {
             return {
-                success: false,
+                status: 'failure',
                 message: 'Collection does not exist.'
             }
         }
