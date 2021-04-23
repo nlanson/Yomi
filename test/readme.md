@@ -19,7 +19,7 @@ Also check `http://localhost:6969` to see if the server is working as intended.
              - /2.jpg
   ```
   
-  ## Build your own Image.
+## Build your own Image.
   You can build your own images for Yomi.\
   To build your own image for the:
   - Server:\
