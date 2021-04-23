@@ -258,7 +258,7 @@ export class Database {
                     message = "Rename failed. Manga exists but FS failed.";
                     return {status: 'error', message: message} //Rename failed. Manga exists but FS failed.
                 }
-                
+
                 //If rename is successful, code will enter this condition.
                 if (flag) { 
                     Logger.log(`DEBUG`, `Successfully Edited ${o} -> ${n}`);

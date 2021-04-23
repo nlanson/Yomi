@@ -114,12 +114,13 @@ export class Server {
             Logger.log(`DEBUG`, 'Edit requested')
             let edit: string = req.params.edit;
             let objectified: EditMangaReqParams = JSON.parse(edit);
-            let ogName: string = objectified.title;
-            let newName = objectified.edit;
+            let ogName: string = objectified.title; //Original name of the manga
+            let newName = objectified.edit; //New name of the manga
 
             let qdb: CommonHandlerResult = await this.db.editMangaName(ogName, newName);
 
             if ( qdb.status == 'success' ) {
+                this.cdb.updateMangaNameForEachEntry(ogName, newName); //Updates the edited manga in every collection.
                 res.status(200).send(qdb); // Full success
             } else {
                 res.status(500).send(qdb); //Partial success. Manga was valid but rename failed.

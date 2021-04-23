@@ -100,10 +100,11 @@ class Server {
                 Logger_1.Logger.log(`DEBUG`, 'Edit requested');
                 let edit = req.params.edit;
                 let objectified = JSON.parse(edit);
-                let ogName = objectified.title;
-                let newName = objectified.edit;
+                let ogName = objectified.title; //Original name of the manga
+                let newName = objectified.edit; //New name of the manga
                 let qdb = yield this.db.editMangaName(ogName, newName);
                 if (qdb.status == 'success') {
+                    this.cdb.updateMangaNameForEachEntry(ogName, newName); //Updates the edited manga in every collection.
                     res.status(200).send(qdb); // Full success
                 }
                 else {

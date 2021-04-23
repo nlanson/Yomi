@@ -118,5 +118,31 @@ export class CollectionEngine {
         this.saveData();
     }
 
+    /**
+     * This method is called when a manga in the DB is edited with a new name.
+     * @param originalName 
+     * @param newName 
+     */
+    updateMangaNameForEachEntry(originalName:string, newName: string) {
+        //Formatting the new and old names as CollectionMangaData Objects.
+        let original: CollectionMangaData = { title: originalName };
+        let edit: CollectionMangaData = { title: newName };
+
+        //For each collection in the coldb, find every instance of the manga to be edited and update..
+        this.coldb.forEach((e: Collection) => {
+            //Find entries. Returns an array of indexes where the manga to be edited is located at.
+            let f:CommonHandlerResult = e.findEntries(original);
+            
+            if (f.status == 'success') {
+                //For each index returned, update it to the new name,
+                for (let i = 0; i<f.data.length; i++) {
+                    e.editEntry(f.data[i].index, edit);
+                }
+            } else if (f.status == 'error') {
+                Logger.log(`ERROR`, `Error when finding entries in collection and attempting to edit.`);
+            }
+                
+        })
+    }
 
 }
