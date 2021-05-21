@@ -14,6 +14,7 @@ import { EditMangaComponent } from './modals/edit-manga/edit-manga.component';
 import { UploadMangaComponent } from './modals/upload-manga/upload-manga.component';
 import { ReadComponent } from './read/read.component';
 import { CollectionFactoryComponent } from './modals/collection-factory/collection-factory.component';
+import { CollectionCardComponent } from './components/collection-card/collection-card.component';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -29,7 +30,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import { CollectionCardComponent } from './collections/collection-card/collection-card.component';
+import { BookCardComponent } from './components/book-card/book-card.component';
+
 
 
 
@@ -43,7 +45,8 @@ import { CollectionCardComponent } from './collections/collection-card/collectio
     UploadMangaComponent,
     ReadComponent,
     CollectionFactoryComponent,
-    CollectionCardComponent
+    CollectionCardComponent,
+    BookCardComponent
   ],
   imports: [
     BrowserModule,

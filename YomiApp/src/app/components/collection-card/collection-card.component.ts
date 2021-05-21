@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import { CommonAPIResult } from '../../database/api.interfaces';
 import { DatabaseService } from '../../database/database.service';
-import { CollectionsComponent } from '../collections.component';
+import { CollectionsComponent } from '../../collections/collections.component';
 
 
 @Component({

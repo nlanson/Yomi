@@ -49,24 +49,6 @@ export class LibraryComponent implements OnInit {
     );
   }
 
-  read(title) {
-    console.log(`read ${title}`);
-    this.router.navigate(['read', title]);
-  }
-
-  openEdit(mangaName): void {
-    const dialogRef = this.dialog.open(EditMangaComponent, {
-      width: '250px',
-      data: { title: mangaName }
-    });
-
-    dialogRef.afterClosed().subscribe( async () => {
-      console.log('The Edit dialog was closed');
-      this.getList();
-    });
-
-  }
-
   openUpload() {
     const dialogRef = this.dialog.open(UploadMangaComponent, {
       width: '500px',
@@ -76,28 +58,6 @@ export class LibraryComponent implements OnInit {
       console.log('The Upload dialog was closed');
       this.getList();
     });
-  }
-
-  showInfo(title) {
-    console.log(title);
-  }
-
-  deleteManga(title) {
-    let r: CommonAPIResult;
-    this.db.delete(title).subscribe(
-      data => {
-        r = data.body;
-        if ( r.status == 'success' )
-          this.openSnackBar(`${title} has been deleted`, `Thanks`);
-          this.getList();
-        },
-      err => {
-        r = err.error;
-        console.log(err.status);
-        this.openSnackBar(`${r.message}`, `Noooo`);
-        this.getList();
-      }
-    );
   }
 
   openSnackBar(message: string, action: string) {

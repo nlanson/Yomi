@@ -4,8 +4,11 @@
 
 <div class="content">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
+
     <div fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' fxLayoutAlign=" stretch" *ngFor="let manga of list">
-      <mat-card class="mat-elevation-z4">
+      <Book-Card [manga]='manga'></Book-Card>
+
+      <!-- <mat-card class="mat-elevation-z4">
         <mat-card-header>
           <mat-card-title>{{manga.title}}</mat-card-title>
           <button mat-icon-button [matMenuTriggerFor]="menu" class='mangaMenu'><mat-icon>more_vert</mat-icon></button>
@@ -19,8 +22,9 @@
           <button mat-raised-button class='actionButtons' (click)="openEdit(manga.title)">EDIT</button>
           <button mat-raised-button color='primary' class='actionButtons' (click)='read(manga.title)'>READ</button>
         </mat-card-footer>
-      </mat-card>
+      </mat-card> -->
     </div>
+
   </div>
 </div>
 <br>
