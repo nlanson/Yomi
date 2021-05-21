@@ -47,12 +47,27 @@ export class CollectionsComponent implements OnInit {
     this.db.getCollections().subscribe(
       data => {
         this.collections = data.body;
+        this.setCovers();
       },
       err => {
         console.log(`List failed to get \n Error: ${err.error}`)
         this.collections = [];
       }
     );
+  }
+
+  //Fetches the cover images for each manga in every collection.
+  private setCovers() {
+    for(let i=0; i<this.collections.length; i++) {
+      for(let k=0; k<this.collections[i].mangas.length; k++) {
+        this.db.getManga(this.collections[i].mangas[k].title).subscribe(
+          data => {
+            let d = data.body;
+            this.collections[i].mangas[k].cover = d.data.cover;
+          }
+        );
+      }
+    }
   }
 
   //Open read page by title.

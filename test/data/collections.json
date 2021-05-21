@@ -1,3 +1,17 @@
 {
-  "save_data": []
+  "save_data": [
+    {
+      "name": "hohoho",
+      "id": "erk32nvfru4",
+      "mangas": [
+        {
+          "title": "Higehiro 1"
+        },
+        {
+          "title": "haha"
+        }
+      ],
+      "count": 2
+    }
+  ]
 }
