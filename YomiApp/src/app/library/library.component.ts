@@ -66,4 +66,23 @@ export class LibraryComponent implements OnInit {
     });
   }
 
+  //Is called from book-card component to delete itself.
+  deleteManga(title: string) {
+    let r: CommonAPIResult;
+    this.db.delete(title).subscribe(
+      data => {
+        r = data.body;
+        if ( r.status == 'success' )
+          this.openSnackBar(`${title} has been deleted`, `Thanks`);
+          this.getList();
+        },
+      err => {
+        r = err.error;
+        console.log(err.status);
+        this.openSnackBar(`${r.message}`, `Noooo`);
+        this.getList();
+      }
+    );
+  }
+
 }

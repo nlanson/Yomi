@@ -51,21 +51,7 @@ export class BookCardComponent implements OnInit {
   }
 
   deleteManga() {
-    let r: CommonAPIResult;
-    this.db.delete(this.manga.title).subscribe(
-      data => {
-        r = data.body;
-        if ( r.status == 'success' )
-          this.openSnackBar(`${this.manga.title} has been deleted`, `Thanks`);
-          this.lib.getList();
-        },
-      err => {
-        r = err.error;
-        console.log(err.status);
-        this.openSnackBar(`${r.message}`, `Noooo`);
-        this.lib.getList();
-      }
-    );
+    this.lib.deleteManga(this.manga.title);
   }
 
   openSnackBar(message: string, action: string) {
