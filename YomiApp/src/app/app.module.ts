@@ -29,6 +29,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { CollectionCardComponent } from './collections/collection-card/collection-card.component';
 
 
 
@@ -41,7 +42,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     EditMangaComponent,
     UploadMangaComponent,
     ReadComponent,
-    CollectionFactoryComponent
+    CollectionFactoryComponent,
+    CollectionCardComponent
   ],
   imports: [
     BrowserModule,

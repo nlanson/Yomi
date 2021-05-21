@@ -5,15 +5,8 @@
 <div *ngIf='collections'>
 
   <div *ngIf='collections.length != 0'>
-    <!-- Test Collection List  (NOT FINAL) -->
     <div *ngFor="let collection of collections">
-      <h3>{{ collection.name }} </h3>
-      <ul>
-        <li *ngFor="let manga of collection.mangas">
-          <a (click)='read(manga.title)'>{{manga.title}} {{manga.cover}}</a>
-        </li>
-      </ul>
-      <button mat-raised-button color='warn' (click)='deleteCol(collection.id)'> Delete Collection </button>
+      <Collection-Info [collection]='collection'></Collection-Info>
     </div>
 
     <br>
