@@ -2,17 +2,23 @@
   <h1> Your Collections: </h1>
 </div>
 
-<!-- Test Collection List  (NOT FINAL)-->
-<div *ngFor="let collection of collections">
-  <h3>{{ collection.name }} </h3>
-  <ul>
-    <li *ngFor="let manga of collection.mangas"><a (click)='read(manga.title)'>{{manga.title}}</a></li>
-  </ul>
-  <button mat-raised-button color='warn' (click)='deleteCol(collection.id)'> Delete Collection </button>
+<div *ngIf='collections.length != 0'>
+  <!-- Test Collection List  (NOT FINAL) -->
+  <div *ngFor="let collection of collections">
+    <h3>{{ collection.name }} </h3>
+    <ul>
+      <li *ngFor="let manga of collection.mangas"><a (click)='read(manga.title)'>{{manga.title}}</a></li>
+    </ul>
+    <button mat-raised-button color='warn' (click)='deleteCol(collection.id)'> Delete Collection </button>
+  </div>
+
+  <br>
+  <button mat-raised-button color='primary' (click)='openCollectionFactory()'>Create new collection</button>
 </div>
 
-<br>
-<button mat-raised-button color='primary' (click)='openCollectionFactory()'>Open Factory</button>
+<div *ngIf='collections.length == 0'>
+  <button mat-raised-button color='primary' (click)='openCollectionFactory()'>Create your first collection!</button>
+</div>
 
 <!--
   NOTES:

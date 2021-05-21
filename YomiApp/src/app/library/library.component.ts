@@ -37,6 +37,7 @@ export class LibraryComponent implements OnInit {
   getList(): void {
     this.db.getList().subscribe(
       data => {
+        console.log('Refreshed')
         this.list = data.body;
       },
       err => {
@@ -88,8 +89,8 @@ export class LibraryComponent implements OnInit {
         r = data.body;
         if ( r.status == 'success' )
           this.openSnackBar(`${title} has been deleted`, `Thanks`);
-        this.getList();
-      },
+          this.getList();
+        },
       err => {
         r = err.error;
         console.log(err.status);

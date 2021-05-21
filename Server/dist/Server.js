@@ -146,6 +146,7 @@ class Server {
                 del = objectified.title;
                 let qdb = yield this.db.deleteManga(del);
                 if (qdb.status == 'success') {
+                    yield this.db.refresh();
                     res.status(200).send({ status: 'success', message: `${del} was deleted.` });
                 }
                 else {

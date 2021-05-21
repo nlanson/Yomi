@@ -164,6 +164,7 @@ export class Server {
             let qdb: CommonHandlerResult = await this.db.deleteManga(del);
 
             if ( qdb.status == 'success' ) {
+                await this.db.refresh(); //DB is refreshed here becase if I try and refresh from application side it doesnt work for some reason.
                 res.status(200).send({status: 'success', message: `${del} was deleted.`});
             } else {
                 res.status(500).send({status: 'failure', message: 'Failed to delete. Check logs'});
