@@ -146,7 +146,7 @@ class Server {
                 del = objectified.title;
                 let qdb = yield this.db.deleteManga(del);
                 if (qdb.status == 'success') {
-                    yield this.db.refresh();
+                    yield this.db.refresh(); //DB is refreshed here becase if I try and refresh from application side it doesnt work for some reason.
                     res.status(200).send({ status: 'success', message: `${del} was deleted.` });
                 }
                 else {
