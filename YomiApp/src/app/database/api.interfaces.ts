@@ -16,13 +16,6 @@ export interface CommonAPIResult { //== CommonHandlerResult in Backend.
 export interface CollectionInfo {
   name: string,
   id: string,
-  mangas: Array<title>,
+  mangas: Array<Partial<MangaData>>,
   count: number
-}
-
-interface title {
-  title: string,
-  path?: string,
-  pageCount: string,
-  cover?: string
 }
