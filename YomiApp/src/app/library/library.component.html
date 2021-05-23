@@ -6,7 +6,12 @@
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
 
     <div fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' fxLayoutAlign=" stretch" *ngFor="let manga of list">
-      <Book-Card [enableMangaDelete]='true' [manga]='manga'></Book-Card>
+      <Book-Card
+      [enableMangaDelete]='true'
+      [manga]='manga'
+      caller='Library'
+      >
+      </Book-Card>
     </div>
 
   </div>

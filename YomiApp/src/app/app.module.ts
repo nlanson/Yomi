@@ -71,7 +71,10 @@ import { BookCardComponent } from './components/book-card/book-card.component';
     MatMenuModule,
     MatCheckboxModule
   ],
-  providers: [LibraryComponent],
+  providers: [
+    LibraryComponent,
+    CollectionsComponent
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

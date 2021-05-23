@@ -9,9 +9,15 @@
   <mat-card-content>
     <div *ngIf='!loading'>
       <div class='float-left' fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' fxLayoutAlign=" stretch" *ngFor='let manga of collection.mangas'>
-        <Book-Card [enableMangaDelete]='false' [manga]='manga'></Book-Card>
+        <Book-Card
+        [enableMangaDelete]='false'
+        [manga]='manga'
+        caller='CollectionInfo'
+        >
+        </Book-Card>
       </div>
     </div>
+    <br>
     <button mat-raised-button color='warn' (click)='deleteCol()'> Delete Collection </button>
   </mat-card-content>
 </mat-card>
