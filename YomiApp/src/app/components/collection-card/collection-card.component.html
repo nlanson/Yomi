@@ -1,8 +1,17 @@
 <!-- Test Collection List  (NOT FINAL) -->
 
-<h3>{{ collection.name }} </h3>
-<ul>
-  <li *ngFor="let manga of collection.mangas">
-    <a (click)='read(manga.title)'>{{manga.title}} {{manga.cover}}</a>
-  </li>
-</ul>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <h1>{{ collection.name }}</h1>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div *ngIf='!loading'>
+      <div class='float-left' fxFlex="10%" fxFlex.xs="100%" fxFlex.sm="33%" fxFlex.md='20%' fxFlex.lg='15%' fxLayoutAlign=" stretch" *ngFor='let manga of collection.mangas'>
+        <Book-Card [enableMangaDelete]='false' [manga]='manga'></Book-Card>
+      </div>
+    </div>
+    <button mat-raised-button color='warn' (click)='deleteCol()'> Delete Collection </button>
+  </mat-card-content>
+</mat-card>

@@ -1,3 +1,14 @@
 {
-  "save_data": []
+  "save_data": [
+    {
+      "name": "my col 2",
+      "id": "2lksp0px9zh",
+      "mangas": [
+        {
+          "title": "haha"
+        }
+      ],
+      "count": 1
+    }
+  ]
 }

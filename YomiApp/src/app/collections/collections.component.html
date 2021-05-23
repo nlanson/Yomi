@@ -7,7 +7,7 @@
   <div *ngIf='collections.length != 0'>
     <div *ngFor="let collection of collections">
       <Collection-Info [collection]='collection'></Collection-Info>
-      <button mat-raised-button color='warn' (click)='deleteCol(collection.id)'> Delete Collection </button>
+      <br>
     </div>
 
     <br>

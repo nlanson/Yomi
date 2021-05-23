@@ -47,7 +47,6 @@ export class CollectionsComponent implements OnInit {
     this.db.getCollections().subscribe(
       data => {
         this.collections = data.body;
-        this.setCovers();
       },
       err => {
         console.log(`List failed to get \n Error: ${err.error}`)
@@ -56,29 +55,16 @@ export class CollectionsComponent implements OnInit {
     );
   }
 
-  //Fetches the cover images for each manga in every collection.
-  private setCovers() {
-    for(let i=0; i<this.collections.length; i++) {
-      for(let k=0; k<this.collections[i].mangas.length; k++) {
-        this.db.getManga(this.collections[i].mangas[k].title).subscribe(
-          data => {
-            let d = data.body;
-            this.collections[i].mangas[k].cover = d.data.cover;
-          }
-        );
-      }
-    }
-  }
-
   //Delete a collection by ID.
   public deleteCol(id: string) {
     let r: CommonAPIResult;
     this.db.deleteCollection(id).subscribe(
       data => {
         r = data.body;
+        this.getCollections();
+        //Open snackbar.
         if (r.status == 'success'){
           this.openSnackBar('Collection has been deleted', 'Great');
-          this.getCollections();
         }
         else
           this.openSnackBar('Collection failed to delete', 'Damn.');
@@ -89,6 +75,8 @@ export class CollectionsComponent implements OnInit {
           this.openSnackBar(r.message, 'Damn.');
         else
           console.log(`err caught but status was declared as ${r.status}`)
+
+        this.getCollections();
       }
     )
   }

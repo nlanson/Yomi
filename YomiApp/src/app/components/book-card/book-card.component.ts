@@ -7,6 +7,7 @@ import { DatabaseService } from '../../database/database.service';
 import { LibraryComponent } from '../../library/library.component';
 import { EditMangaComponent } from '../../modals/edit-manga/edit-manga.component';
 import { CommonAPIResult, MangaData } from '../../database/api.interfaces';
+import { CollectionsComponent } from '../../collections/collections.component';
 
 @Component({
   selector: 'Book-Card',
@@ -16,17 +17,18 @@ import { CommonAPIResult, MangaData } from '../../database/api.interfaces';
 export class BookCardComponent implements OnInit {
 
   @Input() manga: MangaData;
+  @Input() enableMangaDelete: boolean;
 
   constructor(
     private router: Router,
     private dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private db: DatabaseService,
-    private lib: LibraryComponent
+    private lib: LibraryComponent,
+    private colc: CollectionsComponent
   ) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   read() {
     console.log(`read ${this.manga.title}`);
@@ -41,7 +43,11 @@ export class BookCardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe( async () => {
       console.log('The Edit dialog was closed');
+
+      //Refresh all views that could display the manga.
+      //Could possibly have an input to define which component this component is called for to filter which component to refresh.
       this.lib.getList();
+      this.colc.getCollections();
     });
 
   }

@@ -4,7 +4,7 @@
     <button mat-icon-button [matMenuTriggerFor]="menu" class='mangaMenu'><mat-icon>more_vert</mat-icon></button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item (click)='showInfo()'>Info</button>
-      <button mat-menu-item (click)='deleteManga()'>Delete</button>
+      <button *ngIf='enableMangaDelete' mat-menu-item (click)='deleteManga()'>Delete</button>
     </mat-menu>
   </mat-card-header>
   <img mat-card-image src="{{manga.cover}}" class='coverImage'>
