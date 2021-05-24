@@ -18,9 +18,9 @@ type CalledFrom = 'CollectionInfo' | 'Library';
 })
 export class BookCardComponent implements OnInit {
 
-  @Input() manga: Required<MangaData>;
-  @Input() enableMangaDelete: boolean;
-  @Input() caller?: CalledFrom;
+  @Input() public manga: Required<MangaData>;
+  @Input() public enableMangaDelete: boolean;
+  @Input() public caller?: CalledFrom;
 
   constructor(
     private router: Router,

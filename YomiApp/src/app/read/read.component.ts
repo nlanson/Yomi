@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, UrlHandlingStrategy } from '@angular/router';
-import { CommonAPIResult } from '../database/api.interfaces';
+import { CommonAPIResult, ReadMangaData } from '../database/api.interfaces';
 
 import { DatabaseService } from '../database/database.service';
 
@@ -11,9 +11,9 @@ import { DatabaseService } from '../database/database.service';
 })
 export class ReadComponent implements OnInit {
 
-  sub: any;
-  title: string;
-  manga: any;
+  public sub: any;
+  public title: string;
+  public manga: ReadMangaData;
 
   page: number = 0;
 

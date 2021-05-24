@@ -5,6 +5,10 @@ export interface MangaData {
   cover: string;
 }
 
+export interface ReadMangaData extends MangaData{
+  pages: Array<string>;
+}
+
 export type Status = 'success' | 'failure' | 'error';
 
 export interface CommonAPIResult { //== CommonHandlerResult in Backend.

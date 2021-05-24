@@ -14,7 +14,7 @@ import { CollectionsComponent } from '../../collections/collections.component';
 })
 export class CollectionCardComponent implements OnInit {
 
-  @Input() collection: CollectionInfo;
+  @Input() public collection: CollectionInfo;
   public loading: boolean = true;
 
   constructor(

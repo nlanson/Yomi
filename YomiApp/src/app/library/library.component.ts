@@ -20,7 +20,7 @@ import { CommonAPIResult, MangaData } from '../database/api.interfaces';
 export class LibraryComponent implements OnInit {
   @ViewChild('grid') grid: MatGridList;
 
-  list: Array<MangaData>;
+  public list: Array<MangaData>;
 
   constructor(
     private db: DatabaseService,

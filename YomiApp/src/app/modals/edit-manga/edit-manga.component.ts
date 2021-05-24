@@ -15,7 +15,7 @@ import { CommonAPIResult } from 'src/app/database/api.interfaces';
 })
 export class EditMangaComponent implements OnInit {
 
-  editForm: FormGroup;
+  public editForm: FormGroup;
 
   constructor
     (

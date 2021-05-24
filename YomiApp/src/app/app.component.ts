@@ -13,7 +13,7 @@ import { LibraryComponent } from './library/library.component';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'YomiApp';
+  public readonly title = 'YomiApp';
   @ViewChild('snav') snav: MatSidenav;
 
   constructor(

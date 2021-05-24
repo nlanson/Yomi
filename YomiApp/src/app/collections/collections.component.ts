@@ -6,7 +6,7 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 import { CollectionFactoryComponent } from '../modals/collection-factory/collection-factory.component';
-import { CommonAPIResult } from '../database/api.interfaces';
+import { CommonAPIResult, MangaData } from '../database/api.interfaces';
 import { DatabaseService } from '../database/database.service';
 
 
@@ -17,7 +17,7 @@ import { DatabaseService } from '../database/database.service';
 })
 export class CollectionsComponent implements OnInit {
 
-  public collections: Array<any>;
+  public collections: Array<Partial<MangaData>>;
 
   constructor(
     private db: DatabaseService,

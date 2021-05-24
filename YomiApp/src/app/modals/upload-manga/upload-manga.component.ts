@@ -14,12 +14,12 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class UploadMangaComponent implements OnInit {
 
-  uploadForm: FormGroup;
-  file: File = null;
-  progress: number = 0;
-  Math = Math
-  message: string;
-  uploading: Boolean;
+  public uploadForm: FormGroup;
+  public file: File = null;
+  public progress: number = 0;
+  private Math = Math;
+  public message: string;
+  public uploading: Boolean;
 
   constructor(
     private db: DatabaseService,
